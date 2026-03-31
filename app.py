@@ -116,7 +116,7 @@ details summary { color: #7a9cc0 !important; font-size: 0.85rem !important; font
 # SESSION STATE
 # ─────────────────────────────────────────────────────────────────
 for k, v in [("connected", False), ("result", None), ("ar", None),
-               ("session_id", None), ("ai_recs", {})]:
+               ("session_id", None), ("ai_recs", {}), ("agent_results", {})]:
     if k not in st.session_state:
         st.session_state[k] = v
 
@@ -207,6 +207,34 @@ def render_ai_recs(module_key: str):
                 st.rerun()
     else:
         st.info("No AI insights yet for this tab.")
+
+
+def render_agent_plan(tab_key: str):
+    """Call the backend LangGraph agent and show its plan."""
+    sid = st.session_state.get("session_id")
+    if not sid:
+        return
+
+    res_key = f"agent_{tab_key}"
+    if st.button("🤖 Generate agent plan", key=f"btn_{res_key}", use_container_width=True):
+        try:
+            resp = _req.post(f"{API_URL}/agent/{tab_key}",
+                             json={"token": sid, "mode": "steps"},
+                             timeout=40)
+            if resp.status_code == 200:
+                st.session_state["agent_results"][res_key] = resp.json()
+            else:
+                st.session_state["agent_results"][res_key] = {"status": "error", "plan": f"Error {resp.status_code}: {resp.text}"}
+        except Exception as e:
+            st.session_state["agent_results"][res_key] = {"status": "error", "plan": f"Request failed: {e}"}
+        st.experimental_rerun()
+
+    result = st.session_state.get("agent_results", {}).get(res_key)
+    if result:
+        if result.get("status") == "ok":
+            st.markdown(result.get("plan", ""))
+        else:
+            st.warning(result.get("plan", "Agent error"))
 
 def _poll_ai_recs():
     """FastAPI /ai endpoint se latest AI recommendations fetch karo."""
@@ -739,6 +767,7 @@ with tab1:
     st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">Recommendations</p>', unsafe_allow_html=True)
     show_recs(wh["recommendations"])
     render_ai_recs("warehouse")
+    render_agent_plan("warehouse")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -870,6 +899,7 @@ with tab2:
     st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">Recommendations</p>', unsafe_allow_html=True)
     show_recs(qry["recommendations"])
     render_ai_recs("queries")
+    render_agent_plan("queries")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -984,6 +1014,7 @@ with tab3:
     st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">Recommendations</p>', unsafe_allow_html=True)
     show_recs(anom["recommendations"])
     render_ai_recs("anomaly")
+    render_agent_plan("anomaly")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -1095,6 +1126,7 @@ with tab4:
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
     show_recs(cost["recommendations"])
     render_ai_recs("cost")
+    render_agent_plan("cost")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -1119,6 +1151,7 @@ with tab5:
 
     show_recs(stor["recommendations"])
     render_ai_recs("storage")
+    render_agent_plan("storage")
 
     tables = stor.get("tables", [])
     if tables:
@@ -1251,6 +1284,7 @@ with tab7:
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
     st.markdown("**AI Insights**")
     render_ai_recs("unused_objects")
+    render_agent_plan("unused_objects")
 
 
 # ——————————————————————————————————————————————————————————————
@@ -1301,6 +1335,11 @@ with tab8:
         df_an = pd.DataFrame(anomalies)
         st.dataframe(df_an, use_container_width=True, hide_index=True)
 
+    st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("**AI Insights**")
+    render_ai_recs("cloud_services")
+    render_agent_plan("cloud_services")
+
 
 # TAB 10 — SAVINGS & HISTORY
 # ══════════════════════════════════════════════════════════════════
@@ -1325,6 +1364,8 @@ with tab9:
               f"${sum(i['saving_usd'] for i in high_conf):.2f}/mo")
     k3.metric("Saving Opportunities",      len(items))
     k4.metric("Credits Saveable",          f"{sav.get('total_credits',0):.4f}")
+
+    render_agent_plan("savings")
 
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 

@@ -74,3 +74,15 @@ class HealthResponse(BaseModel):
     status:  str = "ok"
     service: str = "SnowAdvisor API"
     version: str = "1.0.0"
+
+
+# Agent
+class AgentRequest(BaseModel):
+    token: str
+    mode:  str = Field("steps", pattern="^(steps|auto)$")
+
+
+class AgentResponse(BaseModel):
+    status:  str
+    plan:    str
+    took_ms: int

@@ -1,7 +1,7 @@
 # api/main.py
 # Run: uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
-import sys, os, logging
+import sys, os, logging, time, json
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -17,9 +17,9 @@ import analysis as analysis_module
 
 from api.session  import generate_token, decrypt_session
 from api.storage  import save_session, get_latest_run, get_history, delete_session
-from api.models   import ConnectRequest, ConnectResponse, HistoryResponse, HealthResponse
+from api.models   import ConnectRequest, ConnectResponse, HistoryResponse, HealthResponse, AgentRequest, AgentResponse
 from api.ai_layers import build_base_insights
-from api.ai_service import queue_ai_generation, AI_LLM_ENABLED
+from api.ai_service import queue_ai_generation, AI_LLM_ENABLED, _call_groq
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s")
 log = logging.getLogger("main")
@@ -214,6 +214,56 @@ def get_ai_recommendations(token: str):
         "total":            total_modules,
         "pct":              round(done_modules / total_modules * 100),
     }
+
+
+# ─────────────────────────────────────────────────────────────
+# AGENT (LangGraph-inspired single-path flow)
+# ─────────────────────────────────────────────────────────────
+
+def _build_agent_prompt(tab: str, tab_data: dict, ai_rec: dict, mode: str) -> str:
+    tab_str = json.dumps(tab_data or {}, default=str)[:2500]
+    ai_str  = json.dumps(ai_rec or {}, default=str)[:1200]
+    mode_desc = "Take action automatically (but only return the SQL, do not execute)" if mode == "auto" else "Return a clear, ordered list of steps to fix the issue."
+    return f"""You are a Snowflake cost-optimization agent working on one dashboard tab: {tab}.
+Data for this tab (only): {tab_str}
+Existing insights for this tab: {ai_str}
+User mode: {mode_desc}
+
+Requirements:
+- If there are anomalies or warnings, identify the top cost driver and fix it.
+- Output concise markdown only. Format:
+  **Issue**: <1 sentence>
+  **Impact**: <cost/perf risk>
+  **Plan**: numbered steps with ready-to-run SQL. Use actual warehouses/tables from the data when present. No placeholders.
+- If action needs approval, prefix the step with [APPROVAL] and explain risk briefly.
+- If no clear issue, give two preventative optimizations tied to the tab data.
+- Do NOT invent Snowflake features (e.g., statistical detection toggle). Stay within warehouse/query/storage controls and resource monitors."""
+
+
+@app.post("/agent/{tab}", response_model=AgentResponse, tags=["agent"])
+def run_agent(tab: str, req: AgentRequest):
+    t0 = time.time()
+    try:
+        raw_id = decrypt_session(req.token)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid or expired session token")
+
+    run = get_latest_run(raw_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    tab_data = run.get(tab)
+    if tab_data is None:
+        raise HTTPException(status_code=404, detail=f"Tab '{tab}' not found in session")
+
+    ai_rec = (run.get("ai_recommendations") or {}).get(tab, {})
+
+    prompt = _build_agent_prompt(tab, tab_data, ai_rec, req.mode)
+    text, err = _call_groq(prompt)
+    if err:
+        raise HTTPException(status_code=502, detail=f"Agent LLM error: {err}")
+
+    return AgentResponse(status="ok", plan=text, took_ms=int((time.time() - t0) * 1000))
 
 
 # ══════════════════════════════════════════════════════════════════
