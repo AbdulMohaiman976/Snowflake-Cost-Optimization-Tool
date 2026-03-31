@@ -74,21 +74,22 @@ def _build_layer4_prompt(module_key: str, tab_data: dict, base_insights: dict) -
     base_str = _truncate_json(base_123, 2500)
     tab_str = _truncate_json(tab_data, 2500)
 
-    return f"""You are a Snowflake optimization expert.
+    return f"""You are a Snowflake cost-optimization agent.
 
 You are given data for ONE TAB only (module_key={module_key}). Do NOT reference or assume anything outside this tab.
 
-Goal: Provide plain-English, immediately implementable fixes for this tab.
+Goal: Provide a single, plain-English, immediately implementable fix for this tab.
 
 Constraints:
-- Output EXACTLY 2 recommendations.
-- Use markdown bullets only (no JSON, no data echo, no long intro).
-- Each recommendation MUST follow:
-  1) **Issue identified** (1-2 sentences)
-  2) **Business impact** (cost/performance/risk)
-  3) **Solution** (step-by-step; include ready-to-run SQL where relevant; avoid “investigate” only)
+- Output EXACTLY 1 recommendation.
+- Use markdown only (no JSON, no data echo, no long intro).
+- Recommendation MUST follow:
+  1) **Issue** (mention anomaly/warning if present, 1 sentence)
+  2) **Impact** (cost/perf/risk, quantify if possible)
+  3) **Fix** (numbered steps; ready-to-run SQL with real warehouse/table names from the data; no placeholders; no "investigate" only)
 - If forecasting is not available for this tab, do NOT mention forecasts.
-- If nothing is wrong, give 2 proactive best-practice improvements with concrete actions.
+- If nothing is wrong, give 1 proactive best-practice improvement tied to this tab's data.
+- Do NOT invent Snowflake features. Stay with warehouses, queries, storage, resource monitors, suspends, sizing, pruning, credits.
 
 Layer 1-3 (already computed):
 {base_str}

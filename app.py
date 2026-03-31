@@ -227,7 +227,7 @@ def render_agent_plan(tab_key: str):
                 st.session_state["agent_results"][res_key] = {"status": "error", "plan": f"Error {resp.status_code}: {resp.text}"}
         except Exception as e:
             st.session_state["agent_results"][res_key] = {"status": "error", "plan": f"Request failed: {e}"}
-        st.experimental_rerun()
+        st.rerun()
 
     result = st.session_state.get("agent_results", {}).get(res_key)
     if result:
@@ -1245,6 +1245,8 @@ with tab6:
         cols_nb = [c for c in rename_nb if c in df_nb.columns]
         st.dataframe(df_nb[cols_nb].rename(columns=rename_nb),
                      use_container_width=True, hide_index=True)
+
+    render_agent_plan("notebooks")
 
 
 # ══════════════════════════════════════════════════════════════════
