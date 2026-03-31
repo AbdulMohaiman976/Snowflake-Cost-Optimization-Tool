@@ -1,0 +1,32 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Environments
+venv/
+.env
+.venv/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and run artifacts
+*.log
+*.out
+*.err
+*.pid
+
+# Local data and databases
+data/
+local_db/
+
+# Streamlit
+.streamlit/
+
+# Packaging / build
+dist/
+build/
+

@@ -1,0 +1,11 @@
+snowflake-connector-python[pandas]
+streamlit
+pandas
+plotly
+
+# FastAPI backend
+fastapi
+uvicorn[standard]
+pymongo
+python-dotenv
+cryptography
