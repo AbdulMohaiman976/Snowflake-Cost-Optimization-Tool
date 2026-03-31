@@ -41,7 +41,7 @@ def connect(account, username, password, warehouse="COMPUTE_WH", role="ACCOUNTAD
 
 
 # ══════════════════════════════════════════════════════════════════
-# B — VERIFY
+# B — VERIFY -- Test
 # ══════════════════════════════════════════════════════════════════
 
 def verify(conn) -> dict:
