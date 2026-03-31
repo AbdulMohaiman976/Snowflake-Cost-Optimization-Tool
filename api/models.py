@@ -46,7 +46,6 @@ class ConnectResponse(BaseModel):
     anomaly:      dict
     cost:         dict
     storage:      dict
-    users:        dict
     savings:      dict
     unused_objects: dict
     cloud_services: dict

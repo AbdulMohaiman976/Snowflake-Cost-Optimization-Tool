@@ -1581,16 +1581,26 @@ def analyze_unused_objects(data: dict) -> dict:
     """
     df = _to_df(data.get("unused_objects", {}))
     if df.empty:
-        return {"tables": [], "total_stale_gb": 0, "total_stale_usd": 0, "recommendations": []}
+        return {
+            "tables": [],
+            "total_stale_gb": 0,
+            "total_stale_usd": 0,
+            "total_stale_credits_est": 0,
+            "recommendations": [],
+        }
 
     df = _n(df, "SIZE_GB", "ROW_COUNT")
     
     # Calculate monthly storage cost for each stale table ($23/TB -> $0.022/GB)
     df["cost_usd"] = df["SIZE_GB"] * (23.0 / 1024.0)
+    # Convert the $ estimate to credits (approx $3 per credit); storage is billed in $ but
+    # frontends sometimes display credits for consistency with compute.
+    df["est_credits"] = df["cost_usd"] / 3.0
     
     stale_tables = df.to_dict("records")
     total_gb     = round(df["SIZE_GB"].sum(), 2)
     total_usd    = round(df["cost_usd"].sum(), 2)
+    total_credits = round(df["est_credits"].sum(), 4)
     
     recs = []
     if total_usd > 10.0:
@@ -1606,6 +1616,7 @@ def analyze_unused_objects(data: dict) -> dict:
         "tables":           stale_tables,
         "total_stale_gb":   total_gb,
         "total_stale_usd":  total_usd,
+        "total_stale_credits_est": total_credits,
         "recommendations":  recs,
     }
 
@@ -1621,43 +1632,83 @@ def analyze_cloud_services(data: dict) -> dict:
     """
     df = _to_df(data.get("warehouse_metering", {}))
     if df.empty:
-        return {"total_cs_credits": 0, "billed_cs_credits": 0, "free_cs_credits": 0, "recommendations": []}
+        return {
+            "totals": {"cloud_credits": 0, "compute_credits": 0, "billed_cs": 0, "free_cs": 0},
+            "warehouses": [],
+            "anomalies": [],
+            "recommendations": [],
+        }
 
-    df = _n(df, "COMPUTE_CREDITS", "CLOUD_CREDITS")
-    
-    # Daily aggregation (CS billing logic is daily)
+    df = _n(df, "COMPUTE_CREDITS", "CLOUD_CREDITS", "TOTAL_CREDITS")
+
+    # Per-warehouse 30d aggregation
+    wh_agg = df.groupby("WAREHOUSE_NAME").agg({
+        "CLOUD_CREDITS": "sum",
+        "COMPUTE_CREDITS": "sum",
+        "TOTAL_CREDITS": "sum",
+    }).reset_index()
+    wh_agg["cs_allowance"] = wh_agg["COMPUTE_CREDITS"] * 0.10
+    wh_agg["billed_cs"]    = (wh_agg["CLOUD_CREDITS"] - wh_agg["cs_allowance"]).clip(lower=0)
+    wh_agg["free_cs"]      = wh_agg["CLOUD_CREDITS"] - wh_agg["billed_cs"]
+    wh_agg["cs_pct_of_total"] = (wh_agg["CLOUD_CREDITS"] / wh_agg["TOTAL_CREDITS"]).replace([float("inf"), -float("inf")], 0).fillna(0) * 100
+
+    warehouses = wh_agg.sort_values("CLOUD_CREDITS", ascending=False).to_dict("records")
+
+    # Daily aggregation for total billing math
     daily = df.groupby("USAGE_DATE").agg({
         "COMPUTE_CREDITS": "sum",
         "CLOUD_CREDITS":   "sum"
     })
-    
-    # 10% allowance
     daily["cs_allowance"] = daily["COMPUTE_CREDITS"] * 0.1
     daily["billed_cs"]    = (daily["CLOUD_CREDITS"] - daily["cs_allowance"]).clip(lower=0)
     daily["free_cs"]      = daily["CLOUD_CREDITS"] - daily["billed_cs"]
-    
+
     total_cs    = round(daily["CLOUD_CREDITS"].sum(), 4)
     billed_cs   = round(daily["billed_cs"].sum(), 4)
     free_cs     = round(daily["free_cs"].sum(), 4)
-    
+    compute_tot = round(daily["COMPUTE_CREDITS"].sum(), 4)
+
+    anomalies = [
+        {
+            "warehouse": r["WAREHOUSE_NAME"],
+            "cloud_services_credits": round(r["CLOUD_CREDITS"], 4),
+            "compute_credits": round(r["COMPUTE_CREDITS"], 4),
+            "billed_cloud_services": round(r["billed_cs"], 4),
+            "cs_pct_of_total": round(r["cs_pct_of_total"], 2),
+            "reason": "Cloud services >10% of compute allowance" if r["billed_cs"] > 0 else "High CS percent",
+        }
+        for r in warehouses
+        if r["billed_cs"] > 0 or r["cs_pct_of_total"] >= 15
+    ]
+
     recs = []
     if billed_cs > total_cs * 0.2:
         recs.append({
             "severity": "MEDIUM",
             "title":    "High Cloud Services Billing",
-            "detail":   f"Your cloud services are {billed_cs} credits over the 10% allowance. Likely cause: high metadata churn (copy, delete, list).",
-            "fix_sql":  "-- Check for high frequency COPY/INSERT commands:\n" + \
-                       "SELECT QUERY_TEXT, USER_NAME, COUNT(*) \n" + \
-                       "FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY \n" + \
-                       "WHERE START_TIME >= DATEADD('day', -7, CURRENT_TIMESTAMP()) \n" + \
-                       "GROUP BY 1, 2 ORDER BY 3 DESC LIMIT 10;"
+            "detail":   f"Cloud services exceeded the 10% allowance by {billed_cs} credits over the last 30 days. Likely high metadata churn (copy/delete/list).",
+            "fix_sql":  "-- Investigate top metadata-heavy commands in last 7 days\n"
+                        "SELECT QUERY_TEXT, USER_NAME, COUNT(*) AS execs\n"
+                        "FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY\n"
+                        "WHERE START_TIME >= DATEADD('day', -7, CURRENT_TIMESTAMP())\n"
+                        "  AND (QUERY_TEXT ILIKE '%COPY%' OR QUERY_TEXT ILIKE '%INSERT%' OR QUERY_TEXT ILIKE '%ALTER%')\n"
+                        "GROUP BY 1,2 ORDER BY execs DESC LIMIT 15;"
         })
-        
+
     return {
+        "totals": {
+            "cloud_credits":  total_cs,
+            "compute_credits": compute_tot,
+            "billed_cs":      billed_cs,
+            "free_cs":        free_cs,
+        },
+        # Backwards-compatible summary keys
         "total_cs_credits":  total_cs,
         "billed_cs_credits": billed_cs,
         "free_cs_credits":   free_cs,
-        "recommendations":   recs,
+        "warehouses": warehouses,
+        "anomalies": anomalies,
+        "recommendations": recs,
     }
 
 
@@ -1682,6 +1733,14 @@ def run_analysis(data: dict, account_info: dict = None) -> dict:
     unused      = analyze_unused_objects(data)
     cloud       = analyze_cloud_services(data)
     health      = calculate_health_score(wh, qry, anomaly, storage, users)
+    # Strip user/anomaly scores for simplified UI
+    if isinstance(health, dict) and isinstance(health.get('scores'), dict):
+        for k in ('users','anomaly'):
+            health['scores'].pop(k, None)
+        if isinstance(health.get('components'), dict):
+            for k in ('users','anomaly'):
+                health['components'].pop(k, None)
+
     savings     = estimate_savings(wh, storage, cost, anomaly)
     auto_sus    = analyze_auto_suspend(data)
 

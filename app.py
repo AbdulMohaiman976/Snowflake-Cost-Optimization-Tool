@@ -150,60 +150,16 @@ def _ai_layer4_done(v) -> bool:
 
 
 def render_ai_recs(module_key: str):
-    """Render the 4-layer AI insights for a single tab (no cross-tab mixing)."""
+    """Render AI insights (LLM output only, no layer labels)."""
     ai_recs = st.session_state.get("ai_recs", {}) or {}
     rec = ai_recs.get(module_key)
     sid = st.session_state.get("session_id")
 
     st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("**AI Insights**")
 
-    # New structured format (dict)
     if isinstance(rec, dict):
-        st.markdown(
-            """
-            <div style='background:linear-gradient(135deg,#1a0a2e,#0d1829);border-left:4px solid #8b5cf6;
-            border-radius:12px;padding:1.0rem 1.2rem;margin-top:0.5rem;border:1px solid #2d1b5a;'>
-              <div style='font-size:0.7rem;color:#7c3aed;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;'>
-                AI Layers</div>
-              <div style='color:#5a7a9a;font-size:0.78rem;margin-top:0.3rem;'>
-                Layer 1: Rule-Based ? Layer 2: Statistical ? Layer 3: Forecast ? Layer 4: LLM (optional)
-              </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-        l1 = rec.get("layer1") or {}
-        l2 = rec.get("layer2") or {}
-        l3 = rec.get("layer3") or {}
         l4 = rec.get("layer4") or {}
-
-        st.markdown("<div style='height:0.6rem;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#4d7aaa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin:0;'>Layer 1 ? Rule-Based Detection</p>", unsafe_allow_html=True)
-        show_recs(l1.get("alerts", []))
-
-        st.markdown("<div style='height:0.6rem;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#4d7aaa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin:0;'>Layer 2 ? Statistical Anomaly Detection</p>", unsafe_allow_html=True)
-        show_recs(l2.get("anomalies", []))
-
-        st.markdown("<div style='height:0.6rem;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#4d7aaa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin:0;'>Layer 3 ? Forecasting</p>", unsafe_allow_html=True)
-        fc = (l3.get("forecast") or {})
-        if fc.get("available"):
-            c1, c2, c3 = st.columns(3)
-            c1.metric("Risk", str(fc.get("risk_level", "LOW")))
-            c2.metric("Predicted 7d Credits", f"{fc.get('predicted_total_credits', 0):.4f}")
-            c3.metric("Predicted 7d Cost", f"${fc.get('predicted_total_cost_usd', 0):.2f}")
-            daily = fc.get("daily", [])
-            if daily:
-                df_fc = pd.DataFrame(daily)
-                st.dataframe(df_fc, use_container_width=True, hide_index=True)
-        else:
-            st.info(l3.get("summary", "No forecast available."))
-
-        st.markdown("<div style='height:0.6rem;'></div>", unsafe_allow_html=True)
-        st.markdown("<p style='color:#4d7aaa;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin:0;'>Layer 4 ? LLM Explanation (Optional)</p>", unsafe_allow_html=True)
-
         stt = (l4.get("status") or "").lower()
         if stt == "complete" and l4.get("recommendations_md"):
             st.markdown(l4.get("recommendations_md", ""))
@@ -211,38 +167,28 @@ def render_ai_recs(module_key: str):
             col_info, col_btn = st.columns([4, 1])
             with col_info:
                 st.markdown(
-                    """
-                    <div style='background:#0b1220;border-left:4px solid #374151;border-radius:10px;padding:0.8rem 1rem;border:1px solid #1a2e4a;'>
-                      <p style='color:#4d6a8a;font-size:0.8rem;margin:0;'>
-                      LLM explanation is generating in the background. Click Refresh to check.</p>
-                    </div>
-                    """,
+                    "<div style='background:#0b1220;border-left:4px solid #374151;border-radius:10px;padding:0.8rem 1rem;border:1px solid #1a2e4a;'>"
+                    "<p style='color:#7a9cc0;font-size:0.8rem;margin:0;'>AI insights are generating...</p>"
+                    "</div>",
                     unsafe_allow_html=True,
                 )
             with col_btn:
-                if st.button("?? Refresh", key=f"ai_refresh_{module_key}"):
+                if st.button("🔄 Refresh", key=f"ai_refresh_{module_key}", use_container_width=True):
                     _poll_ai_recs()
                     st.rerun()
-        elif stt in ("skipped", ""):
-            st.info("LLM explanation is disabled or not needed for this tab.")
         elif stt in ("rate_limited", "error"):
-            err = l4.get("error", "")
-            st.warning(f"LLM explanation not available ({stt}). {err}")
+            st.warning("AI insights not available right now. Please refresh.")
+        else:
+            body = l4 if l4 else rec
+            if isinstance(body, str):
+                st.markdown(body)
+            elif isinstance(body, dict) and body.get("recommendations_md"):
+                st.markdown(body["recommendations_md"])
+            else:
+                st.info("No AI insights yet for this tab.")
         return
 
-    # Legacy markdown string format
-    if rec:
-        st.markdown(
-            """
-            <div style='background:linear-gradient(135deg,#1a0a2e,#0d1829);border-left:4px solid #8b5cf6;border-radius:12px;
-            padding:1.2rem 1.4rem;margin-top:0.5rem;border:1px solid #2d1b5a;'>
-              <div style='font-size:0.7rem;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.6rem;'>
-              AI Insights ? Legacy</div>
-              <div style='color:#e2e8f0;font-size:0.85rem;line-height:1.7;'></div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    if isinstance(rec, str):
         st.markdown(rec)
         return
 
@@ -250,18 +196,17 @@ def render_ai_recs(module_key: str):
         col_info, col_btn = st.columns([4, 1])
         with col_info:
             st.markdown(
-                """
-                <div style='background:#0b1220;border-left:4px solid #374151;border-radius:10px;padding:0.8rem 1rem;border:1px solid #1a2e4a;'>
-                  <p style='color:#4d6a8a;font-size:0.8rem;margin:0;'>
-                  AI insights are not available yet. Click Refresh to check.</p>
-                </div>
-                """,
+                "<div style='background:#0b1220;border-left:4px solid #374151;border-radius:10px;padding:0.8rem 1rem;border:1px solid #1a2e4a;'>"
+                "<p style='color:#4d6a8a;font-size:0.8rem;margin:0;'>AI insights are not available yet. Click Refresh to check.</p>"
+                "</div>",
                 unsafe_allow_html=True,
             )
         with col_btn:
-            if st.button("?? Refresh", key=f"ai_refresh_{module_key}"):
+            if st.button("🔄 Refresh", key=f"ai_refresh_{module_key}", use_container_width=True):
                 _poll_ai_recs()
                 st.rerun()
+    else:
+        st.info("No AI insights yet for this tab.")
 
 def _poll_ai_recs():
     """FastAPI /ai endpoint se latest AI recommendations fetch karo."""
@@ -358,7 +303,10 @@ with st.sidebar:
 
     else:
         # ── TABS: New Connection | Load Session ───────────────────
-        tab_new, tab_load = st.tabs(["🔗 New Connection", "📂 Load Session"])
+        tab_new, tab_load = st.tabs([
+    'New Connection',
+    'Load Session',
+])
 
         # ── TAB 1: New Connection → FastAPI ──────────────────────
         with tab_new:
@@ -410,7 +358,6 @@ with st.sidebar:
                                         "anomaly":       data["anomaly"],
                                         "cost":          data["cost"],
                                         "storage":       data["storage"],
-                                        "users":         data["users"],
                                         "savings":       data["savings"],
                                         "auto_suspend":  data.get("auto_suspend", {}),
                                         "notebooks":     data.get("notebooks", {}),
@@ -477,7 +424,6 @@ with st.sidebar:
                                     "anomaly":       data.get("anomaly", {}),
                                     "cost":          data.get("cost", {}),
                                     "storage":       data.get("storage", {}),
-                                    "users":         data.get("users", {}),
                                     "savings":       data.get("savings", {}),
                                     "auto_suspend":  data.get("auto_suspend", {}),
                                     "notebooks":     data.get("notebooks", {}),
@@ -592,14 +538,12 @@ with col_big:
 
 with col_dims:
     dims = [
-        ("Query Intelligence", health["scores"]["query"]),
-        ("Warehouse Health",   health["scores"]["warehouse"]),
-        ("Storage",            health["scores"]["storage"]),
-        ("User Security",      health["scores"]["users"]),
-        ("Spend Consistency",  health["scores"]["anomaly"]),
+        ("Query Intelligence", health["scores"].get("query", 0)),
+        ("Warehouse Health",   health["scores"].get("warehouse", 0)),
+        ("Storage",            health["scores"].get("storage", 0)),
     ]
-    d1, d2, d3, d4, d5 = st.columns(5)
-    for col_d, (lbl, scr) in zip([d1, d2, d3, d4, d5], dims):
+    d1, d2, d3 = st.columns(3)
+    for col_d, (lbl, scr) in zip([d1, d2, d3], dims):
         col_d.markdown(mini_score(lbl, scr), unsafe_allow_html=True)
 
 st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
@@ -608,17 +552,22 @@ st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
 all_recs = sum([
     ar["warehouse"]["recommendations"], ar["queries"]["recommendations"],
     ar["anomaly"]["recommendations"],   ar["storage"]["recommendations"],
-    ar["users"]["recommendations"],     ar["cost"]["recommendations"],
+    ar["cost"]["recommendations"],
 ], [])
-hc_cnt = sum(1 for r in all_recs if r["severity"]=="HIGH")
-mc_cnt = sum(1 for r in all_recs if r["severity"]=="MEDIUM")
-lc_cnt = sum(1 for r in all_recs if r["severity"]=="LOW")
+hc_recs = [r for r in all_recs if r["severity"]=="HIGH"]
+mc_recs = [r for r in all_recs if r["severity"]=="MEDIUM"]
+lc_recs = [r for r in all_recs if r["severity"]=="LOW"]
 
-ia, ib, ic, id_ = st.columns(4)
-ia.metric("🔴 Critical Issues",  hc_cnt)
-ib.metric("🟡 Warnings",         mc_cnt)
-ic.metric("🟢 Low Priority",     lc_cnt)
-id_.metric("📋 Total Findings",   len(all_recs))
+ia, ib, id_ = st.columns(3)
+show_high = ia.button(f"🔴 Critical Issues ({len(hc_recs)})", use_container_width=True)
+ib.metric("🟡 Warnings", len(mc_recs))
+id_.metric("📋 Total Findings",   len(all_recs) - len(lc_recs))  # exclude low priority
+
+if show_high and hc_recs:
+    st.markdown("<div style='height:0.4rem;'></div>", unsafe_allow_html=True)
+    st.markdown("**Critical Issues (HIGH severity)**")
+    for rec in hc_recs:
+        st.markdown(f"- **{rec.get('title','Issue')}** — {rec.get('detail','')}")
 
 # ── Savings Banner ─────────────────────────────────────────────
 _sav = ar.get("savings", {})
@@ -646,17 +595,18 @@ if _sav.get("total_usd", 0) > 0:
 st.markdown("<div style='height:0.8rem;'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────
-# 8 TABS
+# 9 TABS
 # ─────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "🏭  Warehouse",
-    "🔍  Query Intelligence",
-    "📈  Spend Anomaly",
-    "💰  Cost Breakdown",
-    "🗄️  Storage",
-    "🔐  Security & Users",
-    "📓  Notebooks",
-    "💡  Savings & History",
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
+    'Warehouse',
+    'Query Intelligence',
+    'Spend Anomaly',
+    'Cost Breakdown',
+    'Storage',
+    'Notebooks',
+    'Unused Objects',
+    'Cloud Services',
+    'Savings & History',
 ])
 
 
@@ -1210,139 +1160,7 @@ with tab5:
 
 
 # ══════════════════════════════════════════════════════════════════
-# TAB 6 — SECURITY & USERS
-# ══════════════════════════════════════════════════════════════════
 with tab6:
-    usr = ar["users"]
-
-    st.markdown("""<div style='margin-bottom:1rem;'>
-    <h3 style='color:#c8daf0;font-size:1.1rem;font-weight:700;margin:0;'>Security & User Activity</h3>
-    <p style='color:#2d5a8a;font-size:0.75rem;margin:4px 0 0;'>
-    Login events · Account lockouts · MFA status · Inactive users — Last 30 days</p>
-    </div>""", unsafe_allow_html=True)
-
-    k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("Security Score",      f"{usr['score']}/100")
-    k2.metric("Total Users",         len(usr.get("users",[])))
-    k3.metric("Failed Logins (30d)", usr.get("failed_logins",0))
-    k4.metric("Lockout Events",      usr.get("lock_events",0))
-    k5.metric("No MFA",              usr.get("no_mfa_count",0))
-
-    st.markdown("<div style='height:0.4rem;'></div>", unsafe_allow_html=True)
-
-    # ── Security Events Timeline ──
-    sec_events = usr.get("security_events", [])
-    if sec_events:
-        st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">⚠️ Security Event Timeline</p>', unsafe_allow_html=True)
-        for ev in sec_events:
-            sev = ev.get("severity","MEDIUM")
-            cls = "sa-rec-high" if sev=="HIGH" else "sa-rec-medium"
-            ico = "🔴" if sev=="HIGH" else "🟡"
-            st.markdown(
-                f'<div class="sa-card {cls}">'
-                f'<p class="sa-title">{ico} {ev.get("event","")} — {ev.get("user","")} on {ev.get("date","")}</p>'
-                f'<p class="sa-detail">{ev.get("detail","")}</p>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-    st.markdown("<div style='height:0.3rem;'></div>", unsafe_allow_html=True)
-    cl, cr = st.columns(2, gap="large")
-
-    # ── MFA Status Chart ──
-    with cl:
-        users_list = usr.get("users", [])
-        if users_list:
-            st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">MFA Enrollment Status</p>', unsafe_allow_html=True)
-            df_u = pd.DataFrame(users_list)
-            mfa_yes = sum(1 for u in users_list if u.get("has_mfa"))
-            mfa_no  = len(users_list) - mfa_yes
-            fig = go.Figure(go.Pie(
-                labels=["MFA Enabled ✅","No MFA ❌"],
-                values=[mfa_yes, mfa_no], hole=0.65,
-                marker_colors=["#10b981","#ef4444"],
-                textfont=dict(size=11, color="#c8daf0"),
-            ))
-            fig.update_layout(**PLOTLY_DARK, height=260, showlegend=True,
-                              legend=dict(font=dict(size=10, color="#4d7aaa")))
-            fig.update_xaxes(**AXIS_STYLE)
-            fig.update_yaxes(**AXIS_STYLE)
-            st.plotly_chart(fig, use_container_width=True)
-
-    with cr:
-        # ── Login Events ──
-        login_evts = usr.get("login_events", [])
-        if login_evts:
-            st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">Login Activity (30 days)</p>', unsafe_allow_html=True)
-            df_le = pd.DataFrame(login_evts)
-            df_le["date"] = pd.to_datetime(df_le["date"], errors="coerce")
-            df_le["count"]= pd.to_numeric(df_le["count"], errors="coerce").fillna(0)
-
-            success_by_date = df_le[df_le["success"]==True].groupby("date")["count"].sum().reset_index()
-            failed_by_date  = df_le[df_le["success"]==False].groupby("date")["count"].sum().reset_index()
-
-            fig2 = go.Figure()
-            fig2.add_trace(go.Bar(x=success_by_date["date"], y=success_by_date["count"],
-                                  name="Successful", marker_color="#10b981"))
-            fig2.add_trace(go.Bar(x=failed_by_date["date"], y=failed_by_date["count"],
-                                  name="Failed", marker_color="#ef4444"))
-            fig2.update_layout(**PLOTLY_DARK, height=260, barmode="stack",
-                               legend=dict(orientation="h", y=1.2, font=dict(size=9)))
-            fig2.update_xaxes(**AXIS_STYLE)
-            fig2.update_yaxes(**AXIS_STYLE)
-            st.plotly_chart(fig2, use_container_width=True)
-
-    # ── Users Table ──
-    users_list = usr.get("users", [])
-    if users_list:
-        st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0.8rem 0 0.4rem;">All Users</p>', unsafe_allow_html=True)
-        rows_u = []
-        for u in users_list:
-            risk = u.get("risk","LOW")
-            risk_ico = "🔴" if risk=="HIGH" else "🟡" if risk=="MEDIUM" else "🟢"
-            rows_u.append({
-                "Risk":          f"{risk_ico} {risk}",
-                "Username":      u.get("username",""),
-                "Role":          u.get("role",""),
-                "MFA":           "✅ Yes" if u.get("has_mfa") else "❌ No",
-                "Disabled":      "Yes" if u.get("disabled") else "No",
-                "Days Inactive": u.get("days_inactive",0),
-                "Last Login":    u.get("last_login",""),
-                "Email":         u.get("email",""),
-            })
-        df_users = pd.DataFrame(rows_u)
-
-        def color_risk(val):
-            if "🔴" in str(val): return "background:#200808;color:#fca5a5;font-weight:700;"
-            if "🟡" in str(val): return "background:#201408;color:#fcd34d;font-weight:600;"
-            return "color:#10b981;"
-
-        def color_mfa(val):
-            if "❌" in str(val): return "background:#200808;color:#fca5a5;font-weight:700;"
-            return "color:#10b981;"
-
-        def color_inactive(val):
-            if isinstance(val,(int,float)):
-                if val > 90: return "background:#200808;color:#fca5a5;font-weight:700;"
-                if val > 60: return "background:#201408;color:#fcd34d;"
-            return "color:#4d7aaa;"
-
-        styled_u = (df_users.style
-                    .applymap(color_risk, subset=["Risk"])
-                    .applymap(color_mfa, subset=["MFA"])
-                    .applymap(color_inactive, subset=["Days Inactive"]))
-        st.dataframe(styled_u, use_container_width=True, hide_index=True)
-
-    st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
-    st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">Recommendations</p>', unsafe_allow_html=True)
-    show_recs(usr["recommendations"])
-    render_ai_recs("users")
-
-
-# ══════════════════════════════════════════════════════════════════
-# TAB 7 — NOTEBOOKS
-# ══════════════════════════════════════════════════════════════════
-with tab7:
     nb = ar["notebooks"]
 
     st.markdown("""<div style='margin-bottom:1rem;'>
@@ -1397,9 +1215,96 @@ with tab7:
 
 
 # ══════════════════════════════════════════════════════════════════
-# TAB 8 — SAVINGS & HISTORY
-# ══════════════════════════════════════════════════════════════════
+# ——————————————————————————————————————————————————————————————
+# TAB 8 — UNUSED OBJECTS
+# ——————————————————————————————————————————————————————————————
+with tab7:
+    unused = ar.get("unused_objects", {})
+
+    st.markdown("""<div style='margin-bottom:1rem;'>
+    <h3 style='color:#c8daf0;font-size:1.1rem;font-weight:700;margin:0;'>Unused Objects</h3>
+    <p style='color:#2d5a8a;font-size:0.75rem;margin:4px 0 0;'>
+    Tables not accessed in the last 30 days · Estimated monthly storage cost & credit equivalent</p>
+    </div>""", unsafe_allow_html=True)
+
+    tables = unused.get("tables", [])
+    k1, k2, k3 = st.columns(3)
+    k1.metric("Unused Tables", len(tables))
+    k2.metric("Stale Storage", f"{unused.get('total_stale_gb',0):.2f} GB")
+    k3.metric("Est. Monthly Cost", f"${unused.get('total_stale_usd',0):.2f} · {unused.get('total_stale_credits_est',0):.4f} cr")
+
+    if tables:
+        df_unused = pd.DataFrame(tables)
+        rename_u = {
+            "FULL_TABLE_NAME": "Table",
+            "SIZE_GB": "Size (GB)",
+            "cost_usd": "Est. Cost $/mo",
+            "est_credits": "Est. Credits/mo",
+            "ROW_COUNT": "Rows",
+        }
+        cols_u = [c for c in rename_u if c in df_unused.columns]
+        st.dataframe(df_unused[cols_u].rename(columns=rename_u),
+                     use_container_width=True, hide_index=True)
+    else:
+        st.info("No unused tables detected in the last 30 days.")
+
+    st.markdown("<div style='height:0.5rem;'></div>", unsafe_allow_html=True)
+    st.markdown("**AI Insights**")
+    render_ai_recs("unused_objects")
+
+
+# ——————————————————————————————————————————————————————————————
+# TAB 9 — CLOUD SERVICES
+# ——————————————————————————————————————————————————————————————
 with tab8:
+    cloud = ar.get("cloud_services", {})
+
+    st.markdown("""<div style='margin-bottom:1rem;'>
+    <h3 style='color:#c8daf0;font-size:1.1rem;font-weight:700;margin:0;'>Cloud Services Credits</h3>
+    <p style='color:#2d5a8a;font-size:0.75rem;margin:4px 0 0;'>
+    Cloud services allowance is 10% of compute credits per day · Highlight warehouses exceeding allowance</p>
+    </div>""", unsafe_allow_html=True)
+
+    totals = cloud.get("totals", {})
+    k1, k2, k3, k4 = st.columns(4)
+    k1.metric("Cloud Services Credits", f"{totals.get('cloud_credits',0):.4f}")
+    k2.metric("Compute Credits",        f"{totals.get('compute_credits',0):.4f}")
+    k3.metric("Billed CS (over 10%)",   f"{totals.get('billed_cs',0):.4f}")
+    k4.metric("Free CS",                f"{totals.get('free_cs',0):.4f}")
+
+    st.markdown("<div style='height:0.4rem;'></div>", unsafe_allow_html=True)
+    show_recs(cloud.get("recommendations", []))
+    render_ai_recs("cloud_services")
+
+    wh_rows = cloud.get("warehouses", [])
+    if wh_rows:
+        df_cs = pd.DataFrame(wh_rows)
+        rename_c = {
+            "WAREHOUSE_NAME": "Warehouse",
+            "CLOUD_CREDITS": "Cloud Services",
+            "COMPUTE_CREDITS": "Compute",
+            "TOTAL_CREDITS": "Total",
+            "cs_allowance": "Allowance (10%)",
+            "billed_cs": "Billed CS",
+            "free_cs": "Free CS",
+            "cs_pct_of_total": "CS % of Total",
+        }
+        cols_c = [c for c in rename_c if c in df_cs.columns]
+        st.dataframe(df_cs[cols_c].rename(columns=rename_c),
+                     use_container_width=True, hide_index=True)
+    else:
+        st.info("No cloud services usage detected in the selected window.")
+
+    anomalies = cloud.get("anomalies", [])
+    if anomalies:
+        st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0.6rem 0 0.3rem;">Anomalies (over 10% allowance)</p>', unsafe_allow_html=True)
+        df_an = pd.DataFrame(anomalies)
+        st.dataframe(df_an, use_container_width=True, hide_index=True)
+
+
+# TAB 10 — SAVINGS & HISTORY
+# ══════════════════════════════════════════════════════════════════
+with tab9:
     sav = ar.get("savings", {})
     aus = ar.get("auto_suspend", {})
 
@@ -1506,9 +1411,7 @@ with tab8:
         st.info("Not enough query pattern data for auto-suspend recommendations. Run more queries first.")
 
     st.markdown("<div style='height:1rem;'></div>", unsafe_allow_html=True)
-
-    # ── Historical Trend ──────────────────────────────────────────
-    render_ai_recs("savings")
+    # Historical trend removed per request
     st.markdown('<p style="color:#4d7aaa;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.6rem;">📊 Historical Trend (from MongoDB)</p>', unsafe_allow_html=True)
 
     sid = st.session_state.get("session_id")

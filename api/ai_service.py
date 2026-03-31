@@ -24,7 +24,7 @@ log = logging.getLogger("ai_service")
 # Config
 # -----------------------------
 
-AI_LLM_ENABLED = os.getenv("AI_LLM_ENABLED", "0").strip().lower() in ("1", "true", "yes", "on")
+AI_LLM_ENABLED = os.getenv("AI_LLM_ENABLED", "1").strip().lower() in ("1", "true", "yes", "on")
 AI_LLM_MIN_INTERVAL_SEC = float(os.getenv("AI_LLM_MIN_INTERVAL_SEC", "4.5"))
 AI_LLM_MAX_RETRIES = int(os.getenv("AI_LLM_MAX_RETRIES", "3"))
 
