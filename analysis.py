@@ -660,10 +660,10 @@ def analyze_cost(data: dict) -> dict:
             if is_sys:
                 profile = "Snowflake Internal"
                 note    = "Background system tasks — not user activity"
-            elif "ADMIN" in role.upper():
+            elif (role or "") and "ADMIN" in str(role).upper():
                 profile = "Admin / DBA"
                 note    = f"Admin user — {queries} queries, {avg_sec:.2f}s avg"
-            elif "SERVICE" in uname.upper() or "TOOL" in uname.upper():
+            elif "SERVICE" in (uname or "").upper() or "TOOL" in (uname or "").upper():
                 profile = "Service Account"
                 note    = f"Automated service — {queries} queries"
             else:
@@ -1292,7 +1292,7 @@ def estimate_savings(wh_result: dict, storage_result: dict,
                                    f"  WITH CREDIT_QUOTA = {max(1, round(a.get('avg_credits',0)*2, 1))}\n"
                                    f"  TRIGGERS ON 100 PERCENT DO NOTIFY;"),
                 })
-                # Don't add to total — it's past, not future saving
+                total_saving += saved_usd    # Include this in the total!
 
     # ── 4. Auto-Suspend Saving (if warehouses have long suspend times)
     by_wh = cost_result.get("by_warehouse", [])
@@ -1328,10 +1328,10 @@ def estimate_savings(wh_result: dict, storage_result: dict,
     items = sorted(items, key=lambda x: x["saving_usd"], reverse=True)
 
     return {
-        "items":         items,
-        "total_usd":     round(total_saving, 2),
-        "total_credits": round(sum(i["saving_cr"] for i in items), 4),
-        "item_count":    len(items),
+        "recommendations": items,
+        "total_usd":       round(total_saving, 2),
+        "total_credits":   round(sum(i["saving_cr"] for i in items), 4),
+        "item_count":      len(items),
         "high_confidence": [i for i in items if i["confidence"] == "High"],
     }
 

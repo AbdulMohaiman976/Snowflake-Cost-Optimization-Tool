@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "autoprefixer": "^10.4.27",
+    "axios": "^1.14.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
+    "lucide-react": "^1.7.0",
+    "postcss": "^8.5.8",
+    "react-router-dom": "^7.13.2",
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2"
+  }
+}
