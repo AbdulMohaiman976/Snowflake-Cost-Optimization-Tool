@@ -156,9 +156,11 @@ const StorageAnalytics = () => {
                             <TrendingDown className="w-4 h-4 text-success" />
                             <h4 className="text-xs font-bold text-white uppercase tracking-widest">Potential Capacity Savings</h4>
                           </div>
-                          <p className="text-[10px] text-text-muted/80 leading-relaxed font-medium">Reduce your storage footprint by optimizing Time Travel for temporary dev tables.</p>
+                          <p className="text-[10px] text-text-muted/80 leading-relaxed font-medium">Overhead from Time Travel and Failsafe bytes detected across your active tables.</p>
                         </div>
-                        <h2 className="text-4xl font-extrabold text-success font-mono tracking-tighter">~4.5 TB</h2>
+                        <h2 className="text-4xl font-extrabold text-success font-mono tracking-tighter">
+                            {tables.reduce((acc, t) => acc + (t.tt_gb || 0) + (t.fs_gb || 0), 0).toFixed(1)} GB
+                        </h2>
                     </div>
                 </div>
             </div>

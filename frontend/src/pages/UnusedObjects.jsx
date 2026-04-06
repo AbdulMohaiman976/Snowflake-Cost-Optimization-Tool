@@ -123,10 +123,14 @@ const UnusedObjects = () => {
                             <TrendingDown className="w-5 h-5 text-warning" />
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1 leading-none">Avg Stale Age</p>
-                        <h4 className="text-2xl font-extrabold text-white">45 Days</h4>
+                        <h4 className="text-2xl font-extrabold text-white">
+                            {tables.length > 0 
+                                ? Math.round(tables.reduce((acc, t) => acc + (new Date() - new Date(t.last_altered)) / (1000 * 60 * 60 * 24), 0) / tables.length)
+                                : 0} Days
+                        </h4>
                     </div>
                     <div className="text-[10px] text-text-muted font-bold flex items-center gap-1.5 uppercase tracking-widest">
-                       <div className="w-1.5 h-1.5 bg-warning rounded-full"></div> Increasing trends
+                       <div className="w-1.5 h-1.5 bg-warning rounded-full"></div> {tables.length > 0 ? 'Actionable objects' : 'Optimal state'}
                     </div>
                 </div>
 
@@ -134,9 +138,11 @@ const UnusedObjects = () => {
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-15 transition-opacity"><Layers className="w-20 h-20 text-white" /></div>
                     <div>
                         <p className="text-[10px] text-primary font-black uppercase tracking-[0.2em] mb-4 leading-none">AI Priority</p>
-                        <h4 className="text-xl font-bold text-white line-clamp-1">Cleanup Stage</h4>
+                        <h4 className="text-xl font-bold text-white line-clamp-1">{tables.length > 10 ? 'High Cleanup' : 'Regular Audit'}</h4>
                     </div>
-                    <button className="w-full py-2 bg-primary/20 hover:bg-primary/30 border border-primary/40 text-primary-light text-[10px] font-black uppercase rounded-lg transition-all">Start Cleanup</button>
+                    <div className="w-full h-8 flex items-center justify-center border border-primary/20 rounded-lg text-[10px] font-bold text-primary-light uppercase tracking-widest">
+                        {tables.length > 0 ? 'Awaiting Action' : 'All Clear'}
+                    </div>
                 </div>
             </div>
 

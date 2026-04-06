@@ -54,38 +54,11 @@ const Notebooks = () => {
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Executions</p>
                     <p className="text-xl font-black text-white font-mono">{notebooks.total_runs || 0}</p>
                   </div>
-                  <div className="pl-2">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Compute Used (h)</p>
-                    <p className="text-xl font-black text-primary-light font-mono">1.2h</p>
-                  </div>
-                </div>
-            </div>
-
-            <div className="glass-card p-6 bg-primary/5 border border-dashed border-primary/30 flex flex-col items-start gap-4 mb-8">
-                <div className="flex justify-between items-center w-full">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-primary-light" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
-                            <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Real-time Prescriptive Intelligence</p>
-                        </div>
+                    <div className="pl-2">
+                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Compute Used (h)</p>
+                        <p className="text-xl font-black text-primary-light font-mono">{notebooks.total_compute_hours?.toFixed(1) || '0.0'}h</p>
                     </div>
-                    <button 
-                        onClick={handleExecuteAdvice}
-                        disabled={isGenerating}
-                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
-                    >
-                        {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
-                    </button>
                 </div>
-                {runtimeRecs && (
-                    <div className="w-full mt-4 p-4 bg-background/50 border border-primary/20 rounded-xl relative overflow-hidden group">
-                       <div className="absolute top-0 right-0 p-2 text-[10px] text-primary/40 font-bold uppercase tracking-widest border-l border-b border-primary/20 bg-primary/5">GROQ SYNTHESIS</div>
-                       <pre className="text-sm font-mono text-text-accent leading-relaxed whitespace-pre-wrap overflow-x-auto">{runtimeRecs}</pre>
-                    </div>
-                )}
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -147,6 +120,33 @@ const Notebooks = () => {
                         <h4 className="text-xl font-bold text-white mb-2 tracking-tight">No Snowpark Notebooks Detected</h4>
                         <p className="text-text-muted max-w-sm text-sm">Your Snowflake environment hasn't executed any notebook workloads in the selected time period.</p>
                         <button className="mt-6 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-primary/25">Learn about Notebooks</button>
+                    </div>
+                )}
+            </div>
+
+            <div className="glass-card p-6 bg-primary/5 border border-dashed border-primary/30 flex flex-col items-start gap-4">
+                <div className="flex justify-between items-center w-full">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/20 rounded-lg">
+                            <Sparkles className="w-5 h-5 text-primary-light" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
+                            <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Real-time Prescriptive Intelligence</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={handleExecuteAdvice}
+                        disabled={isGenerating}
+                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                    >
+                        {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
+                    </button>
+                </div>
+                {runtimeRecs && (
+                    <div className="w-full mt-4 p-4 bg-background/50 border border-primary/20 rounded-xl relative overflow-hidden group">
+                       <div className="absolute top-0 right-0 p-2 text-[10px] text-primary/40 font-bold uppercase tracking-widest border-l border-b border-primary/20 bg-primary/5">GROQ SYNTHESIS</div>
+                       <pre className="text-sm font-mono text-text-accent leading-relaxed whitespace-pre-wrap overflow-x-auto">{runtimeRecs}</pre>
                     </div>
                 )}
             </div>

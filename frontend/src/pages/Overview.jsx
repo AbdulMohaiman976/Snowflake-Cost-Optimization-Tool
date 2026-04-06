@@ -91,15 +91,17 @@ const Overview = () => {
             name: new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             credits: d.credits || 0
         })) 
-        : [
-            { name: 'Mon', credits: 24.5 },
-            { name: 'Tue', credits: 18.2 },
-            { name: 'Wed', credits: 28.1 },
-            { name: 'Thu', credits: 32.5 },
-            { name: 'Fri', credits: 22.4 },
-            { name: 'Sat', credits: 12.0 },
-            { name: 'Sun', credits: 15.0 },
-        ];
+        : [];
+
+    const calculateDailyTrend = () => {
+        if (!dailyData || dailyData.length < 2) return 0;
+        const last = dailyData[dailyData.length - 1].credits || 0;
+        const prev = dailyData[dailyData.length - 2].credits || 0;
+        if (prev === 0) return last > 0 ? 100 : 0;
+        return Math.round(((last - prev) / prev) * 100);
+    };
+
+    const spendTrend = calculateDailyTrend();
 
     return (
         <motion.div 
@@ -136,7 +138,7 @@ const Overview = () => {
                     detail={`${(warehouse?.total_credits || 0).toFixed(2)} total credits used`}
                     icon={TrendingUp}
                     color="primary"
-                    trend={+8}
+                    trend={spendTrend !== 0 ? spendTrend : undefined}
                     onClick={() => setSelectedTab('spend')}
                     isSelected={selectedTab === 'spend'}
                 />
@@ -223,21 +225,29 @@ const Overview = () => {
                                     </div>
                                 </div>
                                 <div className="h-[200px]">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={chartData}>
-                                            <defs>
-                                                <linearGradient id="colorCredits" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
-                                                <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                                                </linearGradient>
-                                            </defs>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
-                                            <XAxis dataKey="name" stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
-                                            <YAxis stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
-                                            <Tooltip contentStyle={{ backgroundColor: '#0d1829', border: '1px solid #1a2e4a', borderRadius: '12px' }} />
-                                            <Area type="monotone" dataKey="credits" stroke="#2563eb" strokeWidth={3} fill="url(#colorCredits)" />
-                                        </AreaChart>
-                                    </ResponsiveContainer>
+                                    {chartData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData}>
+                                                <defs>
+                                                    <linearGradient id="colorCredits" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                                                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
+                                                <XAxis dataKey="name" stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#4b5563" fontSize={10} tickLine={false} axisLine={false} />
+                                                <Tooltip contentStyle={{ backgroundColor: '#0d1829', border: '1px solid #1a2e4a', borderRadius: '12px' }} />
+                                                <Area type="monotone" dataKey="credits" stroke="#2563eb" strokeWidth={3} fill="url(#colorCredits)" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center h-full border border-dashed border-white/10 rounded-2xl bg-white/[0.02]">
+                                            <TrendingUp className="w-8 h-8 text-text-muted/20 mb-3" />
+                                            <p className="text-xs font-bold text-text-muted uppercase tracking-widest">No historical spend data yet</p>
+                                            <p className="text-[10px] text-text-muted/60 mt-1">Activity will appear here as Snowflake updates its usage logs.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         )}

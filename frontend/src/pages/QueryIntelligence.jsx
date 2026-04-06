@@ -196,8 +196,8 @@ const QueryIntelligence = () => {
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Total Queries</p>
                         <h4 className="text-2xl font-extrabold text-white">{qry.total || 0}</h4>
                     </div>
-                    <div className="text-[10px] text-success font-bold flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" /> +12.5% increase
+                    <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
+                        <TrendingUp className="w-3.5 h-3.5 opacity-20" /> Active Workload
                     </div>
                 </div>
 
@@ -209,8 +209,8 @@ const QueryIntelligence = () => {
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Avg Execution</p>
                         <h4 className="text-2xl font-extrabold text-white">{qry.avg_exec?.toFixed(1) || '0.0'}s</h4>
                     </div>
-                    <div className="text-[10px] text-success font-bold flex items-center gap-1">
-                        <TrendingDown className="w-3.5 h-3.5" /> -0.8s faster
+                    <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
+                        <Clock className="w-3.5 h-3.5 opacity-20" /> Performance Latency
                     </div>
                 </div>
 
@@ -222,8 +222,9 @@ const QueryIntelligence = () => {
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Detected Issues</p>
                         <h4 className="text-2xl font-extrabold text-white">{qry.problem_count || 0}</h4>
                     </div>
-                    <div className="text-[10px] text-danger font-bold flex items-center gap-1">
-                        <ArrowUpRight className="w-3.5 h-3.5" /> 8 new detections
+                    <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${qry.problem_count > 0 ? 'text-danger' : 'text-success'}`}>
+                        {qry.problem_count > 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />} 
+                        {qry.problem_count > 0 ? 'Optimization candidates' : 'No critical issues'}
                     </div>
                 </div>
 
@@ -235,8 +236,8 @@ const QueryIntelligence = () => {
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Compute Spilled</p>
                         <h4 className="text-2xl font-extrabold text-white">{qry.total_spill_gb?.toFixed(1) || '0.0'} GB</h4>
                     </div>
-                    <div className="text-[10px] text-warning font-bold flex items-center gap-1">
-                        <AlertTriangle className="w-3.5 h-3.5" /> High remote spike
+                    <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${(qry.total_spill_gb || 0) > 1 ? 'text-warning' : 'text-text-muted'}`}>
+                        <Database className="w-3.5 h-3.5 opacity-20" /> Memory Pressure
                     </div>
                 </div>
             </div>
