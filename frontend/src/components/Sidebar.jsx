@@ -31,15 +31,15 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-72 bg-sidebar border-r border-border z-50 flex flex-col pt-8">
+        <aside className="fixed left-0 top-0 h-screen w-72 bg-[#2C7DA0]/90 backdrop-blur-2xl border-r border-white/20 z-50 flex flex-col pt-8">
             <div className="px-8 mb-10">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 border border-primary/20 rounded-xl">
-                        <Snowflake className="w-6 h-6 text-primary-light" />
+                    <div className="p-2 bg-white/10 border border-white/20 rounded-xl">
+                        <Snowflake className="w-6 h-6 text-[#38BDF8]" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold tracking-tight text-white leading-none">Snow<span className="text-primary-light">Advisor</span></h2>
-                        <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1 inline-block">Cost Control</span>
+                        <h2 className="text-xl font-bold tracking-tight text-white leading-none">Snow<span className="text-[#0284C7]">Advisor</span></h2>
+                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 inline-block">Cost Control</span>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@ const Sidebar = () => {
                 </NavLink>
 
                 <div className="h-4 pl-4 pt-4 mb-2">
-                    <span className="text-[10px] font-bold text-text-muted/60 uppercase tracking-[0.2em]">Optimization</span>
+                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Optimization</span>
                 </div>
 
                 {menuItems.map((item) => (

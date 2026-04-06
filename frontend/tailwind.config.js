@@ -7,31 +7,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#080e1a",
-        sidebar: "#060b14",
-        card: "#0d1829",
-        border: "#1a2e4a",
+        background: "#A9D6E5",
+        surface: "#FFFFFF",
+        sidebar: "#2C7DA0",
+        card: "rgba(255, 255, 255, 0.75)",
+        cardLight: "#F8FAFC", 
+        border: "rgba(255, 255, 255, 0.5)",
         primary: {
-          light: "#60a5fa",
-          DEFAULT: "#2563eb",
-          dark: "#1d4ed8",
+          light: "#46A6C9",
+          DEFAULT: "#2C7DA0",
+          dark: "#1B5E7A",
         },
-        secondary: "#7c3aed",
-        success: "#10b981",
-        warning: "#f59e0b",
-        danger: "#ef4444",
+        secondary: "#6366F1", 
+        success: "#059669",
+        warning: "#D97706",
+        danger: "#DC2626",
         text: {
-          muted: "#4d7aaa",
-          DEFAULT: "#e8f0fa",
-          accent: "#c8d6e8",
+          muted: "#5F8B9C",
+          DEFAULT: "#1E3D4A",
+          accent: "#3A606E",
         }
+      },
+      boxShadow: {
+        'soft': '0 4px 20px -5px rgba(44, 125, 160, 0.08)',
+        'card': '0 2px 12px -2px rgba(44, 125, 160, 0.05)',
       },
       fontFamily: {
         sans: ['DM Sans', 'sans-serif'],
         mono: ['DM Mono', 'monospace'],
       },
       backgroundImage: {
-        'glass-gradient': 'linear-gradient(135deg, rgba(13, 24, 41, 0.8), rgba(15, 30, 51, 0.6))',
+        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2))',
       }
     },
   },

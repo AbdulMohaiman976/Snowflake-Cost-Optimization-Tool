@@ -63,15 +63,15 @@ const StorageAnalytics = () => {
         >
             <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Storage Analytics</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Storage Analytics</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Optimization of data footprint, Time Travel overhead, and Failsafe identification across your databases.</p>
                 </div>
                 <div className="flex gap-4">
-                  <div className="p-4 bg-sidebar/50 border border-border rounded-xl">
+                  <div className="p-4 bg-black/30 border border-border rounded-xl">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Active (GB)</p>
-                    <p className="text-xl font-black text-white font-mono">{storageData.total_active_gb?.toFixed(2)}</p>
+                    <p className="text-xl font-black text-text font-mono">{storageData.total_active_gb?.toFixed(2)}</p>
                   </div>
-                  <div className="p-4 bg-sidebar/50 border border-border rounded-xl">
+                  <div className="p-4 bg-black/30 border border-border rounded-xl">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Bloated Tables</p>
                     <p className="text-xl font-black text-danger font-mono">{storageData.bloated_count}</p>
                   </div>
@@ -82,17 +82,17 @@ const StorageAnalytics = () => {
                 <div className="flex justify-between items-center w-full">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-primary-light" />
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
+                            <h3 className="text-sm font-bold text-text uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
                             <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Real-time Prescriptive Intelligence</p>
                         </div>
                     </div>
                     <button 
                         onClick={handleExecuteAdvice}
                         disabled={isGenerating}
-                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                        className={`px-6 py-2 bg-primary text-text text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
                     >
                         {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
                     </button>
@@ -107,7 +107,7 @@ const StorageAnalytics = () => {
 
             <div className="grid grid-cols-5 gap-6">
                 <div className="col-span-3 glass-card p-6">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-6">Largest Tables by Footprint</h3>
+                    <h3 className="text-sm font-bold text-text uppercase tracking-widest mb-6">Largest Tables by Footprint</h3>
                     <div className="h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={topTables} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -121,7 +121,7 @@ const StorageAnalytics = () => {
                                 />
                                 <Tooltip 
                                     contentStyle={{ 
-                                        backgroundColor: '#0d1829', 
+                                        backgroundColor: '#B7ECF9', 
                                         border: '1px solid #1a2e4a',
                                         borderRadius: '8px',
                                         fontSize: '11px',
@@ -143,7 +143,7 @@ const StorageAnalytics = () => {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <Flame className="w-4 h-4 text-danger" />
-                            <h4 className="text-xs font-bold text-white uppercase tracking-widest">Monthly Cost Loss</h4>
+                            <h4 className="text-xs font-bold text-text uppercase tracking-widest">Monthly Cost Loss</h4>
                           </div>
                           <p className="text-[10px] text-text-muted/80 leading-relaxed font-medium">Estimated monthly loss due to excessive data retention and time travel overhead.</p>
                         </div>
@@ -154,7 +154,7 @@ const StorageAnalytics = () => {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             <TrendingDown className="w-4 h-4 text-success" />
-                            <h4 className="text-xs font-bold text-white uppercase tracking-widest">Potential Capacity Savings</h4>
+                            <h4 className="text-xs font-bold text-text uppercase tracking-widest">Potential Capacity Savings</h4>
                           </div>
                           <p className="text-[10px] text-text-muted/80 leading-relaxed font-medium">Overhead from Time Travel and Failsafe bytes detected across your active tables.</p>
                         </div>
@@ -167,17 +167,17 @@ const StorageAnalytics = () => {
 
             <div className="glass-card overflow-hidden">
                 <div className="p-6 border-b border-border bg-sidebar/30 flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">Storage Footprint Registry</h3>
+                  <h3 className="text-sm font-bold text-text uppercase tracking-widest">Storage Footprint Registry</h3>
                   <div className="flex items-center gap-2">
-                    <span className="p-1 px-3 rounded-lg bg-white/5 border border-white/10 text-[10px] font-extrabold text-text-muted uppercase">Top {tables.length} Objects</span>
-                    <button className="p-1 px-3 rounded-lg hover:bg-white/5 border border-border text-[10px] font-extrabold text-text-muted uppercase flex items-center gap-1.5"><Archive className="w-3.5 h-3.5" /> Export Inventory</button>
+                    <span className="p-1 px-3 rounded-lg bg-black/5 border border-black/10 text-[10px] font-extrabold text-text-muted uppercase">Top {tables.length} Objects</span>
+                    <button className="p-1 px-3 rounded-lg hover:bg-black/5 border border-border text-[10px] font-extrabold text-text-muted uppercase flex items-center gap-1.5"><Archive className="w-3.5 h-3.5" /> Export Inventory</button>
                   </div>
                 </div>
                 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-sidebar/50 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
                                 <th className="px-6 py-4">Database Object</th>
                                 <th className="px-6 py-4 text-right">Active (GB)</th>
                                 <th className="px-6 py-4 text-right">Time Travel</th>
@@ -188,17 +188,17 @@ const StorageAnalytics = () => {
                         </thead>
                         <tbody className="divide-y divide-border/50">
                             {tables.map((table, idx) => (
-                                <tr key={idx} className="group hover:bg-white/[0.02] transition-colors">
+                                <tr key={idx} className="group hover:bg-black/[0.02] transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="text-sm font-bold text-white group-hover:text-primary-light flex items-center gap-2">
+                                            <span className="text-sm font-bold text-text group-hover:text-primary flex items-center gap-2">
                                                 {table.table}
                                                 {table.is_system && <span className="text-[8px] px-1.5 py-0.5 bg-sidebar rounded border border-border text-text-muted/40 uppercase font-black tracking-widest">SYSTEM</span>}
                                             </span>
                                             <span className="text-[10px] text-text-muted font-mono">{table.database}.{table.schema}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right font-mono text-[13px] text-white font-bold">{table.active_gb?.toFixed(2)}</td>
+                                    <td className="px-6 py-4 text-right font-mono text-[13px] text-text font-bold">{table.active_gb?.toFixed(2)}</td>
                                     <td className="px-6 py-4 text-right font-mono text-[11px] text-text-muted">{table.tt_gb?.toFixed(2)} GB</td>
                                     <td className="px-6 py-4 text-right font-mono text-[11px] text-text-muted">{table.fs_gb?.toFixed(2)} GB</td>
                                     <td className="px-6 py-4">

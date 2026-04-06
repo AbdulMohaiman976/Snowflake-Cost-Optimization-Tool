@@ -65,13 +65,13 @@ const CostBreakdown = () => {
         >
             <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Cost Breakdown</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Cost Breakdown</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Granular analysis of credit consumption by compute cluster, user workload, and data ownership.</p>
                 </div>
-                <div className="flex gap-4 p-4 bg-sidebar/50 border border-border rounded-xl">
+                <div className="flex gap-4 p-4 bg-black/30 border border-border rounded-xl">
                   <div className="pr-6 border-r border-border/50">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Credit Spend</p>
-                    <p className="text-xl font-black text-white font-mono">{cost.total_credits?.toFixed(2)}</p>
+                    <p className="text-xl font-black text-text font-mono">{cost.total_credits?.toFixed(2)}</p>
                   </div>
                   <div className="pl-2">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Market Price (USD)</p>
@@ -82,7 +82,7 @@ const CostBreakdown = () => {
 
             <div className="grid grid-cols-2 gap-6">
                 <div className="glass-card p-6">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-8">Credits by Warehouse (Top 5)</h3>
+                    <h3 className="text-sm font-bold text-text uppercase tracking-widest mb-8">Credits by Warehouse (Top 5)</h3>
                     <div className="h-[280px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -101,7 +101,7 @@ const CostBreakdown = () => {
                                 </Pie>
                                 <Tooltip 
                                     contentStyle={{ 
-                                        backgroundColor: '#0d1829', 
+                                        backgroundColor: '#B7ECF9', 
                                         border: '1px solid #1a2e4a',
                                         borderRadius: '8px',
                                         fontSize: '11px',
@@ -120,7 +120,7 @@ const CostBreakdown = () => {
                 </div>
 
                 <div className="glass-card p-6">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-widest mb-8">User Cost Attribution</h3>
+                    <h3 className="text-sm font-bold text-text uppercase tracking-widest mb-8">User Cost Attribution</h3>
                     <div className="h-[280px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={byUser.slice(0, 10)} layout="vertical">
@@ -137,7 +137,7 @@ const CostBreakdown = () => {
                                 <Bar dataKey="queries" fill="#2563eb" radius={[0, 4, 4, 0]} barSize={12} />
                                 <Tooltip 
                                     contentStyle={{ 
-                                        backgroundColor: '#0d1829', 
+                                        backgroundColor: '#B7ECF9', 
                                         border: '1px solid #1a2e4a',
                                         borderRadius: '8px',
                                         fontSize: '11px'
@@ -151,7 +151,7 @@ const CostBreakdown = () => {
 
             <div className="glass-card overflow-hidden">
                 <div className="p-6 border-b border-border flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white uppercase tracking-widest">User Workload Profiles</h3>
+                  <h3 className="text-sm font-bold text-text uppercase tracking-widest">User Workload Profiles</h3>
                   <div className="flex gap-2 text-[10px] font-bold text-text-muted uppercase tracking-widest">
                      <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-primary"></div> High Spend</span>
                      <span className="flex items-center gap-1.5 pl-4"><div className="w-2 h-2 rounded-full bg-success"></div> Optimized</span>
@@ -160,7 +160,7 @@ const CostBreakdown = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-sidebar/50 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
                                 <th className="px-6 py-4">User & Role</th>
                                 <th className="px-6 py-4">Profile</th>
                                 <th className="px-6 py-4 text-right">Queries</th>
@@ -171,24 +171,24 @@ const CostBreakdown = () => {
                         </thead>
                         <tbody className="divide-y divide-border/50">
                             {byUser.map((user, idx) => (
-                                <tr key={idx} className="group hover:bg-white/[0.02] transition-colors">
+                                <tr key={idx} className="group hover:bg-black/[0.02] transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="p-2 bg-sidebar border border-border rounded-lg text-text-muted group-hover:text-primary transition-colors">
                                                 {user.is_system ? <Layers className="w-4 h-4" /> : <User className="w-4 h-4" />}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-bold text-white leading-tight">{user.user}</span>
+                                                <span className="text-sm font-bold text-text leading-tight">{user.user}</span>
                                                 <span className="text-[10px] text-text-muted font-mono tracking-tighter uppercase">{user.role}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className={`px-2 py-1 rounded text-[10px] font-bold inline-block border ${user.is_system ? 'border-primary/20 text-primary-light bg-primary/10' : 'border-border text-text-muted bg-sidebar'}`}>
+                                        <div className={`px-2 py-1 rounded text-[10px] font-bold inline-block border ${user.is_system ? 'border-primary/20 text-primary bg-primary/10' : 'border-border text-text-muted bg-sidebar'}`}>
                                             {user.profile}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right font-mono text-xs font-bold text-white">{user.queries?.toLocaleString()}</td>
+                                    <td className="px-6 py-4 text-right font-mono text-xs font-bold text-text">{user.queries?.toLocaleString()}</td>
                                     <td className="px-6 py-4 text-right font-mono text-xs text-text-accent">{user.avg_exec_sec?.toFixed(2)}s</td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex flex-col items-end gap-1.5">
@@ -212,17 +212,17 @@ const CostBreakdown = () => {
                 <div className="flex justify-between items-center w-full">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-primary-light" />
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
+                            <h3 className="text-sm font-bold text-text uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
                             <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Real-time Prescriptive Intelligence — Cost Breakdown Rules</p>
                         </div>
                     </div>
                     <button 
                         onClick={handleExecuteAdvice}
                         disabled={isGenerating}
-                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                        className={`px-6 py-2 bg-primary text-text text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
                     >
                         {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
                     </button>

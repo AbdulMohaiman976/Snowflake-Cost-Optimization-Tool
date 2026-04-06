@@ -35,12 +35,12 @@ const ShieldAlert = (props) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;
   return (
-    <div className="bg-[#0f172a] border border-white/10 rounded-xl p-3 shadow-2xl min-w-[180px]">
+    <div className="bg-[#0f172a] border border-black/10 rounded-xl p-3 shadow-2xl min-w-[180px]">
       <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">{label}</p>
       {payload.map((p, i) => (
         <div key={i} className="flex items-center justify-between gap-4 text-xs">
           <span style={{ color: p.color }} className="font-bold">{p.name}</span>
-          <span className="font-mono font-bold text-white">{p.value?.toFixed(4)}</span>
+          <span className="font-mono font-bold text-text">{p.value?.toFixed(4)}</span>
         </div>
       ))}
     </div>
@@ -95,16 +95,16 @@ const SpendAnomaly = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Spend Anomaly</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Spend Anomaly</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Early detection of credit spikes and unusual workload patterns before they impact your bill.</p>
                 </div>
                 <div className="flex gap-4">
-                  <div className="p-4 bg-sidebar/50 border border-border rounded-xl">
+                  <div className="p-4 bg-black/30 border border-border rounded-xl">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-2 leading-none">Anomalies Detected</p>
                     <p className={`text-2xl font-black font-mono ${anomalyCount > 0 ? 'text-danger' : 'text-success'}`}>{anomalyCount}</p>
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">High Priority</p>
                   </div>
-                  <div className="p-4 bg-sidebar/50 border border-border rounded-xl">
+                  <div className="p-4 bg-black/30 border border-border rounded-xl">
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-2 leading-none">Warnings</p>
                     <p className={`text-2xl font-black font-mono ${warningCount > 0 ? 'text-warning' : 'text-success'}`}>{warningCount}</p>
                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">Medium Priority</p>
@@ -116,7 +116,7 @@ const SpendAnomaly = () => {
             <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h3 className="text-base font-bold text-white mb-1">Credit Spend vs 7-Day Baseline</h3>
+                        <h3 className="text-base font-bold text-text mb-1">Credit Spend vs 7-Day Baseline</h3>
                         <p className="text-[11px] text-text-muted font-medium">Daily credits consumed compared to rolling average — spikes highlighted in red</p>
                     </div>
                     <div className="flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest">
@@ -155,7 +155,7 @@ const SpendAnomaly = () => {
                 ) : (
                     <div className="h-64 flex items-center justify-center border border-dashed border-border rounded-xl">
                         <div className="text-center">
-                            <TrendingUp className="w-10 h-10 text-white/10 mx-auto mb-3" strokeWidth={1} />
+                            <TrendingUp className="w-10 h-10 text-text/10 mx-auto mb-3" strokeWidth={1} />
                             <p className="text-text-muted text-sm">No daily spend data available</p>
                         </div>
                     </div>
@@ -166,7 +166,7 @@ const SpendAnomaly = () => {
             <div className="grid grid-cols-3 gap-6">
                 <div className="col-span-2 glass-card p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-bold text-white uppercase tracking-widest">Detected Anomalies & Warnings</h3>
+                        <h3 className="text-sm font-bold text-text uppercase tracking-widest">Detected Anomalies & Warnings</h3>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">{anomalies.length} events</p>
                     </div>
 
@@ -178,7 +178,7 @@ const SpendAnomaly = () => {
                                 </div>
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                        <p className="text-sm font-bold text-white uppercase tracking-wide">{item.warehouse}</p>
+                                        <p className="text-sm font-bold text-text uppercase tracking-wide">{item.warehouse}</p>
                                         <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border ${item.status === 'ANOMALY' ? 'bg-danger/10 border-danger/20 text-danger' : 'bg-warning/10 border-warning/20 text-warning'}`}>
                                             {item.status}
                                         </span>
@@ -196,7 +196,7 @@ const SpendAnomaly = () => {
                                 </div>
                                 <div>
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest">Credits</p>
-                                    <p className="text-sm font-bold font-mono text-white">{item.credits?.toFixed(4)}</p>
+                                    <p className="text-sm font-bold font-mono text-text">{item.credits?.toFixed(4)}</p>
                                 </div>
                                 <div>
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest">Est. Cost</p>
@@ -207,7 +207,7 @@ const SpendAnomaly = () => {
                     )) : (
                         <div className="p-12 border border-dashed border-border rounded-xl flex flex-col items-center justify-center text-center">
                             <CheckCircle2 className="w-12 h-12 text-success/30 mb-4" strokeWidth={1} />
-                            <p className="text-white font-bold mb-1">No anomalies detected</p>
+                            <p className="text-text font-bold mb-1">No anomalies detected</p>
                             <p className="text-text-muted text-sm max-w-xs">All daily credit usage is within the normal 7-day rolling average range.</p>
                         </div>
                     )}
@@ -220,7 +220,7 @@ const SpendAnomaly = () => {
                             <div className="p-2 bg-danger/10 rounded-lg">
                                 <ShieldAlert className="w-5 h-5 text-danger" />
                             </div>
-                            <h4 className="text-sm font-bold text-white uppercase tracking-widest">Urgent Advisory</h4>
+                            <h4 className="text-sm font-bold text-text uppercase tracking-widest">Urgent Advisory</h4>
                         </div>
                         <p className="text-xs text-text-muted leading-relaxed font-medium">
                             {anomalyCount > 0 
@@ -235,9 +235,9 @@ const SpendAnomaly = () => {
                     <div className="glass-card p-6">
                         <div className="flex items-center gap-3 mb-5">
                             <div className="p-2 bg-primary/10 rounded-lg">
-                                <Layers className="w-5 h-5 text-primary-light" />
+                                <Layers className="w-5 h-5 text-primary" />
                             </div>
-                            <h4 className="text-sm font-bold text-white uppercase tracking-widest">Pattern Recognition</h4>
+                            <h4 className="text-sm font-bold text-text uppercase tracking-widest">Pattern Recognition</h4>
                         </div>
                         <div className="space-y-5">
                             <div>
@@ -267,7 +267,7 @@ const SpendAnomaly = () => {
                             <div className="pt-3 border-t border-border">
                                 <div className="flex items-center justify-between text-xs">
                                     <span className="text-text-muted">Total Events Analyzed</span>
-                                    <span className="font-bold text-white font-mono">{dailyList.length}</span>
+                                    <span className="font-bold text-text font-mono">{dailyList.length}</span>
                                 </div>
                             </div>
                         </div>
@@ -280,17 +280,17 @@ const SpendAnomaly = () => {
                 <div className="flex justify-between items-center w-full">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-primary-light" />
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Anomaly Analysis</h3>
+                            <h3 className="text-sm font-bold text-text uppercase tracking-widest leading-none mb-1">AI Anomaly Analysis</h3>
                             <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Runtime Prescriptive Intelligence — Anomaly &amp; Spend Rules</p>
                         </div>
                     </div>
                     <button 
                         onClick={handleExecuteAdvice}
                         disabled={isGenerating}
-                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                        className={`px-6 py-2 bg-primary text-text text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
                     >
                         {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
                     </button>

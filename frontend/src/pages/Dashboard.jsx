@@ -23,7 +23,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-background relative selection:bg-primary/40 selection:text-white">
+        <div className="flex min-h-screen bg-background relative selection:bg-primary/40 selection:text-text">
             {/* Background Grain */}
             <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-[100] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
             

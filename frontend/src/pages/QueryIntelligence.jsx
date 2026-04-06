@@ -39,7 +39,7 @@ const QueryItem = ({ query }) => {
         'HIGH REMOTE SPILL': 'bg-danger/20 text-danger border-danger/40',
         'POOR PRUNING': 'bg-warning/10 text-warning border-warning/20',
         'QUEUE BOTTLENECK': 'bg-warning/20 text-warning border-warning/40'
-    }[query.problem_tag] || 'bg-sidebar/50 text-text-muted border-border';
+    }[query.problem_tag] || 'bg-black/30 text-text-muted border-border';
 
     const getIcon = (tag) => {
         if (tag === 'OK') return <CheckCircle2 className="w-3.5 h-3.5 text-success" />;
@@ -48,18 +48,18 @@ const QueryItem = ({ query }) => {
     };
 
     return (
-        <div className="border border-border rounded-xl bg-sidebar/30 hover:bg-sidebar/50 transition-all overflow-hidden group">
+        <div className="border border-border rounded-xl bg-sidebar/30 hover:bg-black/30 transition-all overflow-hidden group">
             <div 
                 className="p-5 flex items-center justify-between cursor-pointer"
                 onClick={() => setExpanded(!expanded)}
             >
                 <div className="flex items-center gap-6 flex-1">
                     <div className="p-2.5 bg-background border border-border rounded-lg group-hover:border-primary/50 transition-colors">
-                        <Terminal className="w-4.5 h-4.5 text-primary-light" />
+                        <Terminal className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div className="max-w-md">
                         <div className="flex items-center gap-3 mb-1">
-                          <p className="text-sm font-bold text-white font-mono truncate max-w-[200px]">{query.query_id}</p>
+                          <p className="text-sm font-bold text-text font-mono truncate max-w-[200px]">{query.query_id}</p>
                           <div className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border flex items-center gap-1.5 ${tagColor}`}>
                             {getIcon(query.problem_tag)}
                             {query.problem_tag}
@@ -76,9 +76,9 @@ const QueryItem = ({ query }) => {
                     </div>
                     <div className="text-right">
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-0.5">Scanned</p>
-                        <p className="text-sm font-bold font-mono text-white">{query.scan_pct?.toFixed(1)}%</p>
+                        <p className="text-sm font-bold font-mono text-text">{query.scan_pct?.toFixed(1)}%</p>
                     </div>
-                    <ChevronRight className={`w-5 h-5 text-text-muted transition-transform duration-300 ${expanded ? 'rotate-90 text-primary-light' : ''}`} />
+                    <ChevronRight className={`w-5 h-5 text-text-muted transition-transform duration-300 ${expanded ? 'rotate-90 text-primary' : ''}`} />
                 </div>
             </div>
 
@@ -98,7 +98,7 @@ const QueryItem = ({ query }) => {
                                     </div>
                                     <div>
                                         <p className="text-[10px] font-black text-danger/70 uppercase tracking-widest mb-1">Root Cause — {query.tag}</p>
-                                        <p className="text-sm text-white/80 leading-relaxed">{getReason(query.tag)}</p>
+                                        <p className="text-sm text-text/80 leading-relaxed">{getReason(query.tag)}</p>
                                     </div>
                                 </div>
                             )}
@@ -106,7 +106,7 @@ const QueryItem = ({ query }) => {
                             <div className="grid grid-cols-4 gap-4">
                                 <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Execution Time</p>
-                                    <p className={`text-lg font-extrabold font-mono ${query.exec_sec > 60 ? 'text-danger' : 'text-white'}`}>{query.duration || `${query.exec_sec}s`}</p>
+                                    <p className={`text-lg font-extrabold font-mono ${query.exec_sec > 60 ? 'text-danger' : 'text-text'}`}>{query.duration || `${query.exec_sec}s`}</p>
                                 </div>
                                 <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Data Spilled</p>
@@ -114,7 +114,7 @@ const QueryItem = ({ query }) => {
                                 </div>
                                 <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Queued</p>
-                                    <p className="text-lg font-extrabold font-mono text-white">{query.queued_sec?.toFixed(1) || '0.0'}s</p>
+                                    <p className="text-lg font-extrabold font-mono text-text">{query.queued_sec?.toFixed(1) || '0.0'}s</p>
                                 </div>
                                 <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
                                     <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Partition Pruning</p>
@@ -126,13 +126,13 @@ const QueryItem = ({ query }) => {
                                 <div className="p-4 bg-sidebar/30 border border-border rounded-xl space-y-3">
                                     <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Context</p>
                                     <div className="space-y-2 text-xs">
-                                        <div className="flex justify-between gap-2"><span className="text-text-muted">User</span><span className="font-bold text-white truncate">{query.user || '—'}</span></div>
-                                        <div className="flex justify-between gap-2"><span className="text-text-muted">Warehouse</span><span className="font-bold text-primary-light uppercase text-[10px] truncate">{query.warehouse || '—'}</span></div>
+                                        <div className="flex justify-between gap-2"><span className="text-text-muted">User</span><span className="font-bold text-text truncate">{query.user || '—'}</span></div>
+                                        <div className="flex justify-between gap-2"><span className="text-text-muted">Warehouse</span><span className="font-bold text-primary uppercase text-[10px] truncate">{query.warehouse || '—'}</span></div>
                                         <div className="flex justify-between gap-2"><span className="text-text-muted shrink-0">Run At</span><span className="font-bold text-text-accent text-[10px] truncate">{query.start_time || '—'}</span></div>
                                     </div>
                                 </div>
-                                <div className="col-span-2 bg-[#0b1220] rounded-xl border border-border/50 p-4 font-mono text-xs text-text-accent leading-relaxed relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-2 text-[10px] text-primary/40 font-bold uppercase tracking-widest border-l border-b border-border bg-sidebar/50">SQL SOURCE</div>
+                                <div className="col-span-2 bg-[#C6F2FF] rounded-xl border border-border/50 p-4 font-mono text-xs text-text-accent leading-relaxed relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-2 text-[10px] text-primary/40 font-bold uppercase tracking-widest border-l border-b border-border bg-black/30">SQL SOURCE</div>
                                     <code className="block whitespace-pre-wrap pt-4">{query.query || '(system internal)'}</code>
                                 </div>
                             </div>
@@ -175,15 +175,15 @@ const QueryIntelligence = () => {
         >
             <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-white mb-2">Query Intelligence</h1>
+                  <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Query Intelligence</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Deep analysis of workload patterns, slow running tasks, and resource-heavy executions.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                        <input className="bg-sidebar border border-border rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-primary/50 transition-all w-[300px]" placeholder="Search Query ID, User, or SQL..." />
+                        <input className="bg-sidebar border border-border rounded-xl py-2.5 pl-10 pr-4 text-sm text-text focus:outline-none focus:border-primary/50 transition-all w-[300px]" placeholder="Search Query ID, User, or SQL..." />
                     </div>
-                    <button className="p-2.5 bg-sidebar-item border border-border rounded-xl hover:bg-white/5 transition-all"><Filter className="w-5 h-5 text-text-muted" /></button>
+                    <button className="p-2.5 bg-sidebar-item border border-border rounded-xl hover:bg-black/5 transition-all"><Filter className="w-5 h-5 text-text-muted" /></button>
                 </div>
             </div>
 
@@ -191,10 +191,10 @@ const QueryIntelligence = () => {
                 <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg w-fit mb-4">
-                            <Layers className="w-5 h-5 text-primary-light" />
+                            <Layers className="w-5 h-5 text-primary" />
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Total Queries</p>
-                        <h4 className="text-2xl font-extrabold text-white">{qry.total || 0}</h4>
+                        <h4 className="text-2xl font-extrabold text-text">{qry.total || 0}</h4>
                     </div>
                     <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
                         <TrendingUp className="w-3.5 h-3.5 opacity-20" /> Active Workload
@@ -207,7 +207,7 @@ const QueryIntelligence = () => {
                             <Clock className="w-5 h-5 text-success" />
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Avg Execution</p>
-                        <h4 className="text-2xl font-extrabold text-white">{qry.avg_exec?.toFixed(1) || '0.0'}s</h4>
+                        <h4 className="text-2xl font-extrabold text-text">{qry.avg_exec?.toFixed(1) || '0.0'}s</h4>
                     </div>
                     <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
                         <Clock className="w-3.5 h-3.5 opacity-20" /> Performance Latency
@@ -220,7 +220,7 @@ const QueryIntelligence = () => {
                             <AlertTriangle className="w-5 h-5 text-warning" />
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Detected Issues</p>
-                        <h4 className="text-2xl font-extrabold text-white">{qry.problem_count || 0}</h4>
+                        <h4 className="text-2xl font-extrabold text-text">{qry.problem_count || 0}</h4>
                     </div>
                     <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${qry.problem_count > 0 ? 'text-danger' : 'text-success'}`}>
                         {qry.problem_count > 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />} 
@@ -231,10 +231,10 @@ const QueryIntelligence = () => {
                 <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg w-fit mb-4">
-                            <Database className="w-5 h-5 text-primary-light" />
+                            <Database className="w-5 h-5 text-primary" />
                         </div>
                         <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Compute Spilled</p>
-                        <h4 className="text-2xl font-extrabold text-white">{qry.total_spill_gb?.toFixed(1) || '0.0'} GB</h4>
+                        <h4 className="text-2xl font-extrabold text-text">{qry.total_spill_gb?.toFixed(1) || '0.0'} GB</h4>
                     </div>
                     <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${(qry.total_spill_gb || 0) > 1 ? 'text-warning' : 'text-text-muted'}`}>
                         <Database className="w-3.5 h-3.5 opacity-20" /> Memory Pressure
@@ -244,7 +244,7 @@ const QueryIntelligence = () => {
 
             <div className="glass-card p-6 space-y-6 mb-8">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-white uppercase tracking-widest">Slowest Running Tasks (Last 24h)</h3>
+                    <h3 className="text-sm font-bold text-text uppercase tracking-widest">Slowest Running Tasks (Last 24h)</h3>
                     <p className="text-[10px] text-text-muted/60 font-bold uppercase tracking-[0.1em]">Sort by: Execution Time</p>
                 </div>
                 
@@ -254,17 +254,17 @@ const QueryIntelligence = () => {
                             <div className="h-64 w-full bg-background/50 border border-border rounded-xl p-4">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={topQueries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#00000010" vertical={false} />
                                         <XAxis 
                                             dataKey="query_id" 
-                                            stroke="#ffffff40" 
+                                            stroke="#00000040" 
                                             fontSize={10} 
                                             tickLine={false} 
                                             axisLine={false}
                                             tickFormatter={(val) => val.substring(0, 8) + '...'}
                                         />
                                         <YAxis 
-                                            stroke="#ffffff40" 
+                                            stroke="#00000040" 
                                             fontSize={10} 
                                             tickLine={false} 
                                             axisLine={false}
@@ -292,10 +292,10 @@ const QueryIntelligence = () => {
                         </>
                     ) : (
                         <div className="p-12 border border-dashed border-border rounded-xl flex flex-col items-center justify-center text-center">
-                            <div className="p-4 bg-white/5 border border-white/10 rounded-full mb-6">
-                                <Search className="w-10 h-10 text-white/20" strokeWidth={1} />
+                            <div className="p-4 bg-black/5 border border-black/10 rounded-full mb-6">
+                                <Search className="w-10 h-10 text-text/20" strokeWidth={1} />
                             </div>
-                            <h4 className="text-xl font-bold text-white mb-2">No heavy queries found</h4>
+                            <h4 className="text-xl font-bold text-text mb-2">No heavy queries found</h4>
                             <p className="text-text-muted max-w-xs text-sm">Your Snowflake instance seems to be running efficient workloads tonight.</p>
                         </div>
                     )}
@@ -306,17 +306,17 @@ const QueryIntelligence = () => {
                 <div className="flex justify-between items-center w-full">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-primary/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-primary-light" />
+                            <Sparkles className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <h3 className="text-sm font-bold text-white uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
+                            <h3 className="text-sm font-bold text-text uppercase tracking-widest leading-none mb-1">AI Recommendation</h3>
                             <p className="text-[10px] text-text-muted font-black uppercase tracking-widest">Real-time Prescriptive Intelligence</p>
                         </div>
                     </div>
                     <button 
                         onClick={handleExecuteAdvice}
                         disabled={isGenerating}
-                        className={`px-6 py-2 bg-primary text-white text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
+                        className={`px-6 py-2 bg-primary text-text text-xs font-bold rounded-lg transition-all ${isGenerating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-dark'}`}
                     >
                         {isGenerating ? 'Generating...' : 'Execute AI Analysis'}
                     </button>

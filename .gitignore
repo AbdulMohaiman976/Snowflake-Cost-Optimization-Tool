@@ -1,44 +1,38 @@
-# Byte-compiled / cache
-__pycache__/
-*.py[cod]
-
-# Environments
-venv/
-.env
-.venv/
-**/.env
-
-# OS / editor files
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-
-# Logs and run artifacts
-*.log
-*.out
-*.err
-*.pid
-
-# Local data and databases
-data/
-local_db/
-
-# Streamlit
-.streamlit/
-
-# Node.js
+# Dependency directories
 node_modules/
-dist/
-build/
-.cache/
+jspm_packages/
+venv/
+env/
+.env
 .env.local
 .env.*.local
-.eslintcache
-.stylelintcache
-node_modules/
+
+# Build outputs
+dist/
+build/
+*.pyc
+__pycache__/
+.cache/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local data
+data/
+*.json
+!package.json
+!tsconfig.json
+!composer.json
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

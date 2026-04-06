@@ -8,19 +8,19 @@ const TopBar = () => {
     const info = session?.account_info || {};
 
     return (
-        <header className="h-20 border-b border-border bg-sidebar px-10 flex items-center justify-between sticky top-0 z-40 backdrop-blur-xl bg-opacity-70">
+        <header className="h-20 border-b border-white/20 bg-white/40 px-10 flex items-center justify-between sticky top-0 z-40 backdrop-blur-xl">
             <div className="flex items-center gap-4">
-                <div className="p-3 bg-white/5 border border-white/10 rounded-xl">
-                    <User className="w-5 h-5 text-primary-light" />
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                    <User className="w-5 h-5 text-[#0284C7]" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-wide uppercase">Snowflake Context</h3>
+                  <h3 className="text-sm font-bold text-[#0F172A] tracking-wide uppercase">Snowflake Context</h3>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-text-muted font-mono">{info.account}</span>
-                    <span className="w-1 h-1 bg-white/20 rounded-full"></span>
-                    <span className="text-xs text-text-muted">{info.user}</span>
-                    <span className="w-1 h-1 bg-white/20 rounded-full"></span>
-                    <span className="text-xs text-text-muted px-1.5 py-0.5 bg-primary/10 border border-primary/20 rounded text-primary-light font-bold text-[10px]">{info.role}</span>
+                    <span className="text-xs text-slate-500 font-mono">{info.account}</span>
+                    <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                    <span className="text-xs text-slate-500">{info.user}</span>
+                    <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                    <span className="text-xs text-[#0284C7] px-1.5 py-0.5 bg-[#0284C7]/10 border border-[#0284C7]/20 rounded font-bold text-[10px]">{info.role}</span>
                   </div>
                 </div>
             </div>
@@ -31,20 +31,20 @@ const TopBar = () => {
                   <span className="text-[10px] font-bold text-success uppercase tracking-wider">Live Analysis</span>
                 </div>
                 
-                <button className="p-2.5 text-text-muted hover:text-white transition-colors relative">
+                <button className="p-2.5 text-slate-400 hover:text-[#0F172A] transition-colors relative">
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-sidebar"></span>
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
                 </button>
 
                 <div className="flex items-center gap-3 pl-6 border-l border-border h-10 group cursor-pointer">
                   <div className="text-right">
-                    <p className="text-sm font-bold text-white group-hover:text-primary transition-colors">{info.user?.split('.')[0] || 'User'}</p>
-                    <p className="text-[10px] text-text-muted font-bold tracking-widest uppercase">Member</p>
+                    <p className="text-sm font-bold text-[#0F172A] group-hover:text-[#0284C7] transition-colors">{info.user?.split('.')[0] || 'User'}</p>
+                    <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">Member</p>
                   </div>
-                  <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/20 flex items-center justify-center text-primary-light font-bold text-sm">
+                  <div className="w-9 h-9 rounded-full bg-[#0284C7]/10 border border-[#0284C7]/20 flex items-center justify-center text-[#0284C7] font-bold text-sm">
                     {info.user?.charAt(0).toUpperCase() || 'U'}
                   </div>
-                  <ChevronDown className="w-4 h-4 text-text-muted" />
+                  <ChevronDown className="w-4 h-4 text-slate-400" />
                 </div>
             </div>
         </header>
