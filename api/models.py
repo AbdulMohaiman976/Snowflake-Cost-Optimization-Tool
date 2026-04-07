@@ -48,7 +48,6 @@ class ConnectResponse(BaseModel):
     storage:      dict
     savings:      dict
     unused_objects: dict
-    cloud_services: dict
     notebooks:      dict
     auto_suspend:   dict
     ai_json:        Optional[dict] = None

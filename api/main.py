@@ -84,7 +84,6 @@ def connect(req: ConnectRequest):
         "storage":        ar.get("storage", {}),
         "savings":        ar.get("savings", {}),
         "unused_objects": ar.get("unused_objects", {}),
-        "cloud_services": ar.get("cloud_services", {}),
         "notebooks":      ar.get("notebooks", {}),
     }
     base_ai = {k: build_base_insights(k, v, llm_enabled=AI_LLM_ENABLED) for k, v in tab_queue_map.items()}
@@ -107,7 +106,6 @@ def connect(req: ConnectRequest):
             "storage":        ar["storage"],
             "savings":        ar["savings"],
             "unused_objects": ar["unused_objects"],
-            "cloud_services": ar["cloud_services"],
             "notebooks":      ar["notebooks"],
             "auto_suspend":   ar["auto_suspend"],
             "ai_json":        ar["ai_json"],
@@ -150,11 +148,10 @@ def connect(req: ConnectRequest):
         storage=ar["storage"],
         savings=ar["savings"],
         unused_objects=ar["unused_objects"],
-        cloud_services=ar["cloud_services"],
         notebooks=ar.get("notebooks", {}),
         auto_suspend=ar.get("auto_suspend", {}),
         ai_json=ar.get("ai_json", {}),
-        ai_recommendations=base_ai,   # Layer 1-3 ready instantly; Layer 4 optional
+        ai_recommendations=base_ai,
     )
 
 
@@ -236,7 +233,7 @@ Requirements:
   **Impact**: <cost/perf risk>
   **Plan**: numbered steps with ready-to-run SQL. Use actual warehouses/tables from the data when present. No placeholders.
 - If action needs approval, prefix the step with [APPROVAL] and explain risk briefly.
-- If no clear issue, give two preventative optimizations tied to the tab data.
+- If no clear issues or anomalies are detected, simply state: "**No issues detected.**"
 - Do NOT invent Snowflake features (e.g., statistical detection toggle). Stay within warehouse/query/storage controls and resource monitors."""
 
 

@@ -26,8 +26,6 @@ const Sidebar = () => {
         { name: 'Cost Breakdown', icon: BarChart3, path: '/dashboard/cost' },
         { name: 'Storage', icon: Archive, path: '/dashboard/storage' },
         { name: 'Notebooks', icon: BookOpen, path: '/dashboard/notebooks' },
-        { name: 'Unused Objects', icon: Layers, path: '/dashboard/unused' },
-        { name: 'Cloud Services', icon: Cloud, path: '/dashboard/cloud' },
     ];
 
     return (

@@ -102,37 +102,48 @@ def pull_account_usage(conn) -> dict:
 
         # ── 1. Warehouse Advisor ─────────────────────────────────────────
         "warehouse_advisor": """
+            WITH wh_query_stats AS (
+                SELECT
+                    WAREHOUSE_NAME,
+                    WAREHOUSE_SIZE,
+                    COUNT(*)                                                        AS total_queries,
+                    ROUND(AVG(EXECUTION_TIME)/1000.0, 2)                           AS avg_exec_sec,
+                    ROUND(
+                        AVG(COALESCE(QUEUED_OVERLOAD_TIME,0))
+                        / NULLIF(AVG(EXECUTION_TIME),0) * 100.0
+                    , 2)                                                            AS queue_ratio_pct,
+                    ROUND(
+                        SUM(CASE WHEN COALESCE(BYTES_SPILLED_TO_LOCAL_STORAGE,0)
+                                    + COALESCE(BYTES_SPILLED_TO_REMOTE_STORAGE,0) > 0
+                                 THEN 1 ELSE 0 END)::FLOAT / NULLIF(COUNT(*),0) * 100.0
+                    , 2)                                                            AS spill_rate_pct,
+                    ROUND(
+                        AVG(CASE WHEN COALESCE(PARTITIONS_TOTAL,0) > 0
+                                 THEN (1.0 - PARTITIONS_SCANNED::FLOAT
+                                       / PARTITIONS_TOTAL) * 100.0
+                                 ELSE 100.0 END)
+                    , 2)                                                            AS avg_pruning_pct,
+                    ROUND(SUM(COALESCE(BYTES_SPILLED_TO_REMOTE_STORAGE,0))/1e9, 3) AS remote_spill_gb,
+                    ROUND(SUM(COALESCE(BYTES_SPILLED_TO_LOCAL_STORAGE,0))/1e9, 3)  AS local_spill_gb
+                FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
+                WHERE START_TIME >= DATEADD('day', -30, CURRENT_TIMESTAMP())
+                  AND WAREHOUSE_NAME IS NOT NULL
+                  AND EXECUTION_STATUS = 'SUCCESS'
+                GROUP BY 1, 2
+            ),
+            wh_credits AS (
+                SELECT
+                    WAREHOUSE_NAME,
+                    SUM(CREDITS_USED) AS total_credits
+                FROM SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY
+                WHERE START_TIME >= DATEADD('day', -30, CURRENT_TIMESTAMP())
+                GROUP BY 1
+            )
             SELECT
-                qh.WAREHOUSE_NAME,
-                qh.WAREHOUSE_SIZE,
-                COUNT(*)                                                        AS total_queries,
-                ROUND(AVG(qh.EXECUTION_TIME)/1000.0, 2)                        AS avg_exec_sec,
-                ROUND(
-                    AVG(COALESCE(qh.QUEUED_OVERLOAD_TIME,0))
-                    / NULLIF(AVG(qh.EXECUTION_TIME),0) * 100.0
-                , 2)                                                            AS queue_ratio_pct,
-                ROUND(
-                    SUM(CASE WHEN COALESCE(qh.BYTES_SPILLED_TO_LOCAL_STORAGE,0)
-                                + COALESCE(qh.BYTES_SPILLED_TO_REMOTE_STORAGE,0) > 0
-                             THEN 1 ELSE 0 END)::FLOAT / NULLIF(COUNT(*),0) * 100.0
-                , 2)                                                            AS spill_rate_pct,
-                ROUND(
-                    AVG(CASE WHEN COALESCE(qh.PARTITIONS_TOTAL,0) > 0
-                             THEN (1.0 - qh.PARTITIONS_SCANNED::FLOAT
-                                   / qh.PARTITIONS_TOTAL) * 100.0
-                             ELSE 100.0 END)
-                , 2)                                                            AS avg_pruning_pct,
-                ROUND(SUM(COALESCE(wm.CREDITS_USED,0)), 4)                     AS total_credits,
-                ROUND(SUM(COALESCE(qh.BYTES_SPILLED_TO_REMOTE_STORAGE,0))/1e9, 3) AS remote_spill_gb,
-                ROUND(SUM(COALESCE(qh.BYTES_SPILLED_TO_LOCAL_STORAGE,0))/1e9, 3)  AS local_spill_gb
-            FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY qh
-            LEFT JOIN SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY wm
-                ON  qh.WAREHOUSE_NAME = wm.WAREHOUSE_NAME
-                AND DATE_TRUNC('hour', qh.START_TIME) = DATE_TRUNC('hour', wm.START_TIME)
-            WHERE qh.START_TIME >= DATEADD('day', -30, CURRENT_TIMESTAMP())
-              AND qh.WAREHOUSE_NAME IS NOT NULL
-              AND qh.EXECUTION_STATUS = 'SUCCESS'
-            GROUP BY 1, 2
+                q.*,
+                ROUND(COALESCE(c.total_credits, 0), 4) AS total_credits
+            FROM wh_query_stats q
+            LEFT JOIN wh_credits c ON q.WAREHOUSE_NAME = c.WAREHOUSE_NAME
             ORDER BY total_credits DESC
         """,
 
@@ -361,23 +372,9 @@ def pull_account_usage(conn) -> dict:
             LIMIT 100
         """,
 
-        # ── 11. Cloud Services Credits analysis ─────────────────────────
-        "cloud_services": """
-            SELECT 
-                WAREHOUSE_NAME,
-                ROUND(SUM(CREDITS_USED_CLOUD_SERVICES), 4) as cloud_services_credits,
-                ROUND(SUM(CREDITS_USED_COMPUTE), 4) as compute_credits,
-                ROUND(SUM(CREDITS_USED), 4) as total_credits,
-                ROUND((SUM(CREDITS_USED_CLOUD_SERVICES) / NULLIF(SUM(CREDITS_USED), 0)) * 100, 2) as cloud_services_pct
-            FROM SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY
-            WHERE START_TIME >= DATEADD('day', -30, CURRENT_TIMESTAMP())
-            GROUP BY 1
-            HAVING cloud_services_credits > 0
-            ORDER BY cloud_services_credits DESC
-        """,
     }
 
-    log.info("Pulling 11 ACCOUNT_USAGE tables...")
+    log.info("Pulling 10 ACCOUNT_USAGE tables...")
     result = {}
     for name, sql in queries.items():
         rows, cols, error = _q(conn, name, sql)

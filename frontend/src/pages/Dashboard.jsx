@@ -10,7 +10,6 @@ import SpendAnomaly from './SpendAnomaly';
 import CostBreakdown from './CostBreakdown';
 import StorageAnalytics from './StorageAnalytics';
 import UnusedObjects from './UnusedObjects';
-import CloudServices from './CloudServices';
 import Notebooks from './Notebooks';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,7 +42,6 @@ const Dashboard = () => {
                             <Route path="cost" element={<CostBreakdown />} />
                             <Route path="storage" element={<StorageAnalytics />} />
                             <Route path="unused" element={<UnusedObjects />} />
-                            <Route path="cloud" element={<CloudServices />} />
                             <Route path="notebooks" element={<Notebooks />} />
                         </Routes>
                     </AnimatePresence>

@@ -81,15 +81,12 @@ You are given data for ONE TAB only (module_key={module_key}). Do NOT reference 
 Goal: Provide a single, plain-English, immediately implementable fix for this tab.
 
 Constraints:
-- Output EXACTLY 1 recommendation.
-- Use markdown only (no JSON, no data echo, no long intro).
-- Recommendation MUST follow:
-  1) **Issue** (mention anomaly/warning if present, 1 sentence)
-  2) **Impact** (cost/perf/risk, quantify if possible)
-  3) **Fix** (numbered steps; ready-to-run SQL with real warehouse/table names from the data; no placeholders; no "investigate" only)
-- If forecasting is not available for this tab, do NOT mention forecasts.
-- If nothing is wrong, give 1 proactive best-practice improvement tied to this tab's data.
-- Do NOT invent Snowflake features. Stay with warehouses, queries, storage, resource monitors, suspends, sizing, pruning, credits.
+- If NO clear issues or risks are detected, simply state: "**No issues detected.** Your configuration is within healthy parameters." (Do not show Issue/Impact/Fix sections).
+- If an issue is found:
+  1) **Issue** (1 sentence summary)
+  2) **Impact** (cost/perf/risk)
+  3) **Fix** (numbered steps; MUST include ready-to-run SQL using real warehouse/table names; no placeholders)
+- Do NOT invent Snowflake features.
 
 Layer 1-3 (already computed):
 {base_str}

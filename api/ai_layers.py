@@ -105,19 +105,10 @@ class LayeredInsights:
 
 def should_generate_llm(insights: dict) -> bool:
     """
-    Only call the LLM when there's something meaningful to explain.
-    This reduces rate-limit risk and avoids fluff for "all good" tabs.
+    Always trigger LLM review to ensure the 'No issues detected' or 'Issue/Fix' 
+    logic is applied consistently to all tabs.
     """
-    if not isinstance(insights, dict):
-        return False
-
-    layer1_alerts = ((insights.get("layer1") or {}).get("alerts") or [])
-    layer3_fc = (insights.get("layer3") or {}).get("forecast") or {}
-    has_forecast_signal = bool(layer3_fc.get("available")) and bool(
-        layer3_fc.get("risk_level") in ("MEDIUM", "HIGH")
-    )
-
-    return bool(layer1_alerts or has_forecast_signal)
+    return True
 
 
 def build_base_insights(module_key: str, data: dict, *, llm_enabled: bool) -> dict:
@@ -308,18 +299,6 @@ def _layer1_rule_based(module_key: str, data: dict) -> dict:
                     "severity": "MEDIUM",
                     "title": "Elevated login failures",
                     "detail": f"{failed} failed login(s) detected — investigate potential brute-force or misconfigured automation.",
-                    "fix_sql": "",
-                }
-            )
-
-    elif module_key == "cloud_services":
-        billed = _safe_float(data.get("billed_cs_credits"))
-        if billed > 0:
-            alerts.append(
-                {
-                    "severity": "LOW",
-                    "title": "Cloud Services over free threshold",
-                    "detail": f"Estimated billed cloud services credits: {billed:.4f}.",
                     "fix_sql": "",
                 }
             )

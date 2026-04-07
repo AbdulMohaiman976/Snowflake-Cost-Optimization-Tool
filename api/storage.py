@@ -2,7 +2,7 @@
 # MongoDB storage with proper multi-tenant isolation.
 # Each (account_name + username) = separate session document in Atlas.
 
-import os, uuid, logging
+import os, uuid, logging, json, certifi
 from datetime import datetime, timezone
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -11,23 +11,34 @@ load_dotenv()
 
 log = logging.getLogger("storage")
 
-# ── MongoDB Connection ───────────────────────────────────────────────
+# ── Storage Configuration ───────────────────────────────────────────────
 
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 MONGO_DB  = os.getenv("MONGO_DB", "snowadvisor")
 
+# ── MongoDB Initialization ───────────────────────────────────────────
+
+client = None
+db = None
+sessions_col = None
+
 try:
-    client = MongoClient(MONGO_URI)
+    # Simple connection attempt, relying on certifi for CA validation
+    client = MongoClient(
+        MONGO_URI, 
+        serverSelectionTimeoutMS=5000, 
+        tlsCAFile=certifi.where()
+    )
     db = client[MONGO_DB]
-    # Collection for sessions
     sessions_col = db["sessions"]
-    # Ensure indexes for performance and unique lookup
+    # Check if we can actually reach the server
+    client.server_info()
     sessions_col.create_index([("account_name", 1), ("username", 1)], background=True)
     log.info(f"MongoDB connected: {MONGO_DB}")
 except Exception as e:
-    log.error(f"MongoDB connection failed: {e}")
-    # Fallback or error raising? Let's assume user wants Atlas working.
-    raise e
+    log.error(f"FATAL: MongoDB connection failed ({e}). Exiting.")
+    raise RuntimeError(f"MongoDB connection failed: {e}")
+
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -38,24 +49,27 @@ except Exception as e:
 # ══════════════════════════════════════════════════════════════════
 
 def save_session(account_name: str, username: str, analysis: dict) -> str:
-    # 1. Look for existing tenant
-    doc = sessions_col.find_one({
+    query = {
         "account_name": account_name.upper(),
         "username":     username.upper()
-    })
+    }
+
+    # 1. Look for existing tenant
+    doc = sessions_col.find_one(query)
 
     if doc:
         raw_id = doc["_id"]
     else:
         # Create new tenant
         raw_id = str(uuid.uuid4())
-        sessions_col.insert_one({
+        new_tenant = {
             "_id":          raw_id,
             "account_name": account_name.upper(),
             "username":     username.upper(),
             "created_at":   datetime.now(timezone.utc),
             "runs":         [],
-        })
+        }
+        sessions_col.insert_one(new_tenant)
         log.info(f"New MongoDB tenant: {account_name}/{username} → {raw_id[:8]}")
 
     # 2. Append this run to the tenant's list
@@ -65,11 +79,7 @@ def save_session(account_name: str, username: str, analysis: dict) -> str:
         **analysis,
     }
 
-    sessions_col.update_one(
-        {"_id": raw_id},
-        {"$push": {"runs": run_entry}}
-    )
-    
+    sessions_col.update_one({"_id": raw_id}, {"$push": {"runs": run_entry}})
     log.info(f"Run saved to Atlas: {raw_id[:8]} | {account_name}/{username}")
     return raw_id
 
@@ -91,6 +101,7 @@ def get_latest_run(raw_id: str) -> dict | None:
 
 def get_history(raw_id: str) -> dict | None:
     doc = sessions_col.find_one({"_id": raw_id})
+        
     if not doc:
         return None
 
@@ -119,7 +130,9 @@ def get_history(raw_id: str) -> dict | None:
 
 def delete_session(raw_id: str) -> bool:
     res = sessions_col.delete_one({"_id": raw_id})
-    if res.deleted_count > 0:
+    deleted = res.deleted_count > 0
+
+    if deleted:
         log.info(f"Session deleted from Atlas: {raw_id[:8]}")
         return True
     return False
@@ -130,26 +143,23 @@ def delete_session(raw_id: str) -> bool:
 # ══════════════════════════════════════════════════════════════════
 
 def update_ai_recommendation(raw_id: str, module_key: str, recommendation: dict):
-    # Get the number of runs to target the latest one
     doc = sessions_col.find_one({"_id": raw_id}, {"runs": 1})
+        
     if not doc or not doc.get("runs"):
         return
 
     last_idx = len(doc["runs"]) - 1
     
-    # If recommendation is a dict with 'layer4', we target just that sub-path
     if isinstance(recommendation, dict) and "layer4" in recommendation:
         field_path = f"runs.{last_idx}.ai_recommendations.{module_key}.layer4"
         val = recommendation["layer4"]
     else:
-        # Otherwise update the whole module key
         field_path = f"runs.{last_idx}.ai_recommendations.{module_key}"
         val = recommendation
     
-    sessions_col.update_one(
-        {"_id": raw_id},
-        {"$set": {field_path: val}}
-    )
+    update_op = {"$set": {field_path: val}}
+    
+    sessions_col.update_one({"_id": raw_id}, update_op)
     log.info(f"AI rec saved to Atlas: {raw_id[:8]} / {module_key}")
 
 
@@ -157,11 +167,8 @@ def update_ai_recommendations_bulk(raw_id: str, updates: dict):
     if not isinstance(updates, dict) or not updates:
         return
     
-def update_ai_recommendations_bulk(raw_id: str, updates: dict):
-    if not isinstance(updates, dict) or not updates:
-        return
-    
     doc = sessions_col.find_one({"_id": raw_id}, {"runs": 1})
+        
     if not doc or not doc.get("runs"):
         return
 
@@ -170,16 +177,18 @@ def update_ai_recommendations_bulk(raw_id: str, updates: dict):
     mongo_set = {}
     for module_key, patch in updates.items():
         if isinstance(patch, dict):
-            # If patch contains specific layers, we update them individually to avoid overwriting neighbors
             for layer_key in ("layer1", "layer2", "layer3", "layer4"):
                 if layer_key in patch:
                     mongo_set[f"runs.{last_idx}.ai_recommendations.{module_key}.{layer_key}"] = patch[layer_key]
+            
             # If no layers found, update the whole module key
-            if not any(lk in patch[module_key] if module_key in patch else False for lk in ("layer1", "layer2", "layer3", "layer4")):
+            layers = ("layer1", "layer2", "layer3", "layer4")
+            if not any(lk in (patch[module_key] if module_key in patch else patch) for lk in layers):
                  mongo_set[f"runs.{last_idx}.ai_recommendations.{module_key}"] = patch
         else:
             mongo_set[f"runs.{last_idx}.ai_recommendations.{module_key}"] = patch
 
     if mongo_set:
-        sessions_col.update_one({"_id": raw_id}, {"$set": mongo_set})
+        update_op = {"$set": mongo_set}
+        sessions_col.update_one({"_id": raw_id}, update_op)
         log.info(f"AI recs bulk saved to Atlas: {raw_id[:8]} / {len(updates)} module(s)")
