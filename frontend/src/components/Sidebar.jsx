@@ -29,15 +29,15 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="fixed left-0 top-0 h-screen w-72 bg-[#2C7DA0]/90 backdrop-blur-2xl border-r border-white/20 z-50 flex flex-col pt-8">
+        <aside className="fixed left-0 top-0 h-screen w-72 bg-white/60 backdrop-blur-2xl border-r border-black/10 z-50 flex flex-col pt-8">
             <div className="px-8 mb-10">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/10 border border-white/20 rounded-xl">
-                        <Snowflake className="w-6 h-6 text-[#38BDF8]" />
+                    <div className="p-2 bg-white border border-black/10 rounded-xl">
+                        <Snowflake className="w-6 h-6 text-[#2C7DA0]" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold tracking-tight text-white leading-none">Snow<span className="text-[#0284C7]">Advisor</span></h2>
-                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1 inline-block">Cost Control</span>
+                        <h2 className="text-xl font-bold tracking-tight text-black leading-none">Snow<span className="text-[#2C7DA0]">Advisor</span></h2>
+                        <span className="text-[10px] text-black/60 font-bold uppercase tracking-widest mt-1 inline-block">Cost Control</span>
                     </div>
                 </div>
             </div>
@@ -52,8 +52,8 @@ const Sidebar = () => {
                     Overview
                 </NavLink>
 
-                <div className="h-4 pl-4 pt-4 mb-2">
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">Optimization</span>
+                <div className="h-4 pl-4 pt-2 mb-2">
+                    <span className="text-[10px] font-extrabold text-black/70 uppercase tracking-[0.2em]">Optimization</span>
                 </div>
 
                 {menuItems.map((item) => (
@@ -68,10 +68,10 @@ const Sidebar = () => {
                 ))}
             </nav>
 
-            <div className="p-4 border-t border-border mt-auto">
+            <div className="p-4 border-t border-black/10 mt-auto">
                 <button 
                     onClick={logout}
-                    className="w-full side-nav-item text-danger hover:bg-danger/5 transition-colors"
+                    className="w-full side-nav-item text-black hover:bg-black/5 transition-colors"
                 >
                     <LogOut className="w-5 h-5 mr-3" />
                     Sign Out

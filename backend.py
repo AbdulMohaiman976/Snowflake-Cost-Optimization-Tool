@@ -1,5 +1,5 @@
 # backend.py
-# Snowflake se connect karo, ACCOUNT_USAGE se data nikalo, JSON save karo.
+# Snowflake se connect karo, ACCOUNT_USAGE se data nikalo.
 # dashboard.py yahan se sirf run_full_pipeline() call karta hai.
 
 import json, os, logging
@@ -12,8 +12,7 @@ from snowflake.connector import DictCursor
 logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(levelname)s  %(message)s")
 log = logging.getLogger("backend")
 
-DATA_FOLDER = os.path.join(os.path.dirname(__file__), "data")
-os.makedirs(DATA_FOLDER, exist_ok=True)
+DATA_FOLDER = None
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -383,32 +382,11 @@ def pull_account_usage(conn) -> dict:
 
 
 # ══════════════════════════════════════════════════════════════════
-# F — SAVE JSON
+# F — SAVE JSON (disabled: MongoDB Atlas is the source of truth)
 # ══════════════════════════════════════════════════════════════════
 
 def save_json(account_info: dict, data: dict) -> tuple:
-    slug_a = (account_info.get("account", "unknown")
-            .replace(".", "_").replace("-", "_").lower())
-    slug_u = (account_info.get("user", "unknown")
-            .replace(".", "_").replace("-", "_").lower())
-    ts   = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"tenant_{slug_a}_{slug_u}_{ts}.json"
-    filepath = os.path.join(DATA_FOLDER, filename)
-
-    summary = {
-        name: {"rows": t["count"], "has_data": t["count"] > 0, "error": t["error"]}
-        for name, t in data.items()
-    }
-    output = {
-        "meta":    {"exported_at": datetime.now().isoformat(), "tool": "SnowAdvisor"},
-        "account": account_info,
-        "summary": summary,
-        "data":    data,
-    }
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(output, f, indent=2, default=str)
-    log.info(f"Saved: {filepath}")
-    return filepath, filename
+    raise RuntimeError("Local JSON storage is disabled. Use MongoDB Atlas.")
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -435,9 +413,6 @@ def run_full_pipeline(account, username, password,
             return result
         data = pull_account_usage(conn)
         result["data"] = data
-        fp, fn = save_json(result["account_info"], data)
-        result["filepath"] = fp
-        result["filename"] = fn
         result["success"]  = True
     except Exception as e:
         log.error(f"Pipeline error: {e}", exc_info=True)

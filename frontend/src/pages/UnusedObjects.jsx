@@ -161,7 +161,7 @@ const UnusedObjects = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/20 text-[10px] font-bold text-black uppercase tracking-widest border-b border-black/10">
                                 <th className="px-6 py-4">Full Table Name</th>
                                 <th className="px-6 py-4">Table Type</th>
                                 <th className="px-6 py-4 text-right">Row Count</th>
@@ -175,16 +175,16 @@ const UnusedObjects = () => {
                                 <tr key={idx} className="group hover:bg-black/[0.02] transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-sidebar border border-border rounded lg text-text-muted group-hover:text-danger-light group-hover:bg-danger/10 group-hover:border-danger/30 transition-all">
+                                            <div className="p-2 bg-white border border-black/10 rounded lg text-black group-hover:text-danger-light group-hover:bg-danger/10 group-hover:border-danger/30 transition-all">
                                                 <Database className="w-3.5 h-3.5" />
                                             </div>
                                             <span className="text-xs font-bold text-text group-hover:text-danger-light transition-colors truncate max-w-sm">{table.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 font-mono text-[10px] text-text-muted uppercase">{table.type}</td>
-                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-text-accent">{table.rows?.toLocaleString()}</td>
+                                    <td className="px-6 py-4 font-mono text-[10px] text-black uppercase">{table.type}</td>
+                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-black">{table.rows?.toLocaleString()}</td>
                                     <td className="px-6 py-4 text-right font-mono text-[11px] text-text font-bold">{table.size_gb?.toFixed(2)}</td>
-                                    <td className="px-6 py-4 font-mono text-[10px] text-text-muted">
+                                    <td className="px-6 py-4 font-mono text-[10px] text-black">
                                         {new Date(table.last_altered).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 text-center">

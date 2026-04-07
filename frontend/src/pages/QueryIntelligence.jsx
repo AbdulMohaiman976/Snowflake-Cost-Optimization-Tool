@@ -39,7 +39,7 @@ const QueryItem = ({ query }) => {
         'HIGH REMOTE SPILL': 'bg-danger/20 text-danger border-danger/40',
         'POOR PRUNING': 'bg-warning/10 text-warning border-warning/20',
         'QUEUE BOTTLENECK': 'bg-warning/20 text-warning border-warning/40'
-    }[query.problem_tag] || 'bg-black/30 text-text-muted border-border';
+    }[query.problem_tag] || 'bg-white text-black border-black/10';
 
     const getIcon = (tag) => {
         if (tag === 'OK') return <CheckCircle2 className="w-3.5 h-3.5 text-success" />;
@@ -47,14 +47,22 @@ const QueryItem = ({ query }) => {
         return <AlertTriangle className="w-3.5 h-3.5 text-warning" />;
     };
 
+    const getReason = (tag) => {
+        if (tag === 'SLOW QUERY') return 'Query execution time exceeded threshold ??? consider optimizing filters or clustering.';
+        if (tag === 'HIGH REMOTE SPILL') return 'Query spilled to remote storage due to memory pressure.';
+        if (tag === 'POOR PRUNING') return 'Partition pruning is low ??? add appropriate filters or clustering keys.';
+        if (tag === 'QUEUE BOTTLENECK') return 'Queue time is high ??? warehouse is saturated or undersized.';
+        return 'No performance issues detected.';
+    };
+
     return (
-        <div className="border border-border rounded-xl bg-sidebar/30 hover:bg-black/30 transition-all overflow-hidden group">
+        <div className="border border-black/10 rounded-xl bg-white/70 hover:bg-white transition-all overflow-hidden group">
             <div 
                 className="p-5 flex items-center justify-between cursor-pointer"
                 onClick={() => setExpanded(!expanded)}
             >
                 <div className="flex items-center gap-6 flex-1">
-                    <div className="p-2.5 bg-background border border-border rounded-lg group-hover:border-primary/50 transition-colors">
+                    <div className="p-2.5 bg-white border border-black/10 rounded-lg group-hover:border-primary/50 transition-colors">
                         <Terminal className="w-4.5 h-4.5 text-primary" />
                     </div>
                     <div className="max-w-md">
@@ -65,20 +73,20 @@ const QueryItem = ({ query }) => {
                             {query.problem_tag}
                           </div>
                         </div>
-                        <p className="text-xs text-text-muted truncate max-w-[400px]">{query.query_text}</p>
+                        <p className="text-xs text-black truncate max-w-[400px]">{query.query_text}</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-8 pr-4">
                     <div className="text-right">
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-0.5">Execution</p>
-                        <p className={`text-sm font-bold font-mono ${query.exec_seconds > 60 ? 'text-danger' : 'text-text-accent'}`}>{query.exec_seconds}s</p>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-0.5">Execution</p>
+                        <p className={`text-sm font-bold font-mono ${query.exec_seconds > 60 ? 'text-danger' : 'text-black'}`}>{query.exec_seconds}s</p>
                     </div>
                     <div className="text-right">
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-0.5">Scanned</p>
-                        <p className="text-sm font-bold font-mono text-text">{query.scan_pct?.toFixed(1)}%</p>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-0.5">Scanned</p>
+                        <p className="text-sm font-bold font-mono text-black">{query.scan_pct?.toFixed(1)}%</p>
                     </div>
-                    <ChevronRight className={`w-5 h-5 text-text-muted transition-transform duration-300 ${expanded ? 'rotate-90 text-primary' : ''}`} />
+                    <ChevronRight className={`w-5 h-5 text-black/60 transition-transform duration-300 ${expanded ? 'rotate-90 text-primary' : ''}`} />
                 </div>
             </div>
 
@@ -88,7 +96,7 @@ const QueryItem = ({ query }) => {
                         initial={{ height: 0 }}
                         animate={{ height: 'auto' }}
                         exit={{ height: 0 }}
-                        className="overflow-hidden bg-background/50 border-t border-border"
+                        className="overflow-hidden bg-white/70 border-t border-black/10"
                     >
                         <div className="p-6 space-y-5">
                             {query.tag && query.tag !== 'OK' && (
@@ -97,42 +105,42 @@ const QueryItem = ({ query }) => {
                                         <AlertTriangle className="w-4 h-4 text-danger" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-danger/70 uppercase tracking-widest mb-1">Root Cause — {query.tag}</p>
-                                        <p className="text-sm text-text/80 leading-relaxed">{getReason(query.tag)}</p>
+                                        <p className="text-[10px] font-black text-danger/70 uppercase tracking-widest mb-1">Root Cause ??? {query.tag}</p>
+                                        <p className="text-sm text-black leading-relaxed">{getReason(query.tag)}</p>
                                     </div>
                                 </div>
                             )}
 
                             <div className="grid grid-cols-4 gap-4">
-                                <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
-                                    <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Execution Time</p>
-                                    <p className={`text-lg font-extrabold font-mono ${query.exec_sec > 60 ? 'text-danger' : 'text-text'}`}>{query.duration || `${query.exec_sec}s`}</p>
+                                <div className="p-3 bg-white/70 border border-black/10 rounded-xl">
+                                    <p className="text-[9px] text-black font-black uppercase tracking-widest mb-1">Execution Time</p>
+                                    <p className={`text-lg font-extrabold font-mono ${query.exec_sec > 60 ? 'text-danger' : 'text-black'}`}>{query.duration || `${query.exec_sec}s`}</p>
                                 </div>
-                                <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
-                                    <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Data Spilled</p>
+                                <div className="p-3 bg-white/70 border border-black/10 rounded-xl">
+                                    <p className="text-[9px] text-black font-black uppercase tracking-widest mb-1">Data Spilled</p>
                                     <p className={`text-lg font-extrabold font-mono ${query.spill_gb > 0 ? 'text-warning' : 'text-success'}`}>{query.spill_gb?.toFixed(3) || '0.000'} GB</p>
                                 </div>
-                                <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
-                                    <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Queued</p>
-                                    <p className="text-lg font-extrabold font-mono text-text">{query.queued_sec?.toFixed(1) || '0.0'}s</p>
+                                <div className="p-3 bg-white/70 border border-black/10 rounded-xl">
+                                    <p className="text-[9px] text-black font-black uppercase tracking-widest mb-1">Queued</p>
+                                    <p className="text-lg font-extrabold font-mono text-black">{query.queued_sec?.toFixed(1) || '0.0'}s</p>
                                 </div>
-                                <div className="p-3 bg-sidebar/40 border border-border rounded-xl">
-                                    <p className="text-[9px] text-text-muted font-black uppercase tracking-widest mb-1">Partition Pruning</p>
+                                <div className="p-3 bg-white/70 border border-black/10 rounded-xl">
+                                    <p className="text-[9px] text-black font-black uppercase tracking-widest mb-1">Partition Pruning</p>
                                     <p className={`text-lg font-extrabold font-mono ${(query.pruning_pct || 100) < 50 ? 'text-danger' : 'text-success'}`}>{query.pruning_pct?.toFixed(1) || '100.0'}%</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-3 gap-4">
-                                <div className="p-4 bg-sidebar/30 border border-border rounded-xl space-y-3">
-                                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest">Context</p>
+                                <div className="p-4 bg-white/70 border border-black/10 rounded-xl space-y-3">
+                                    <p className="text-[10px] text-black font-bold uppercase tracking-widest">Context</p>
                                     <div className="space-y-2 text-xs">
-                                        <div className="flex justify-between gap-2"><span className="text-text-muted">User</span><span className="font-bold text-text truncate">{query.user || '—'}</span></div>
-                                        <div className="flex justify-between gap-2"><span className="text-text-muted">Warehouse</span><span className="font-bold text-primary uppercase text-[10px] truncate">{query.warehouse || '—'}</span></div>
-                                        <div className="flex justify-between gap-2"><span className="text-text-muted shrink-0">Run At</span><span className="font-bold text-text-accent text-[10px] truncate">{query.start_time || '—'}</span></div>
+                                        <div className="flex justify-between gap-2"><span className="text-black">User</span><span className="font-bold text-black truncate">{query.user || '???'}</span></div>
+                                        <div className="flex justify-between gap-2"><span className="text-black">Warehouse</span><span className="font-bold text-primary uppercase text-[10px] truncate">{query.warehouse || '???'}</span></div>
+                                        <div className="flex justify-between gap-2"><span className="text-black shrink-0">Run At</span><span className="font-bold text-black text-[10px] truncate">{query.start_time || '???'}</span></div>
                                     </div>
                                 </div>
-                                <div className="col-span-2 bg-[#C6F2FF] rounded-xl border border-border/50 p-4 font-mono text-xs text-text-accent leading-relaxed relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 p-2 text-[10px] text-primary/40 font-bold uppercase tracking-widest border-l border-b border-border bg-black/30">SQL SOURCE</div>
+                                <div className="col-span-2 bg-[#C6F2FF] rounded-xl border border-black/10 p-4 font-mono text-xs text-black leading-relaxed relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 p-2 text-[10px] text-black font-bold uppercase tracking-widest border-l border-b border-black/10 bg-white/70">SQL SOURCE</div>
                                     <code className="block whitespace-pre-wrap pt-4">{query.query || '(system internal)'}</code>
                                 </div>
                             </div>
@@ -180,47 +188,47 @@ const QueryIntelligence = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-                        <input className="bg-sidebar border border-border rounded-xl py-2.5 pl-10 pr-4 text-sm text-text focus:outline-none focus:border-primary/50 transition-all w-[300px]" placeholder="Search Query ID, User, or SQL..." />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-black/60" />
+                        <input className="bg-white/70 border border-black/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-black focus:outline-none focus:border-primary/50 transition-all w-[300px]" placeholder="Search Query ID, User, or SQL..." />
                     </div>
-                    <button className="p-2.5 bg-sidebar-item border border-border rounded-xl hover:bg-black/5 transition-all"><Filter className="w-5 h-5 text-text-muted" /></button>
+                    <button className="p-2.5 bg-white/70 border border-black/10 rounded-xl hover:bg-white transition-all"><Filter className="w-5 h-5 text-black/60" /></button>
                 </div>
             </div>
 
             <div className="grid grid-cols-4 gap-6 mb-8">
-                <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
+                <div className="p-6 glass-card bg-gradient-to-br from-white/70 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg w-fit mb-4">
                             <Layers className="w-5 h-5 text-primary" />
                         </div>
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Total Queries</p>
-                        <h4 className="text-2xl font-extrabold text-text">{qry.total || 0}</h4>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-[0.2em] mb-1">Total Queries</p>
+                        <h4 className="text-2xl font-extrabold text-black">{qry.total || 0}</h4>
                     </div>
-                    <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
+                    <div className="text-[10px] text-black font-bold flex items-center gap-1 uppercase tracking-widest">
                         <TrendingUp className="w-3.5 h-3.5 opacity-20" /> Active Workload
                     </div>
                 </div>
 
-                <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
+                <div className="p-6 glass-card bg-gradient-to-br from-white/70 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-success/10 border border-success/20 rounded-lg w-fit mb-4">
                             <Clock className="w-5 h-5 text-success" />
                         </div>
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Avg Execution</p>
-                        <h4 className="text-2xl font-extrabold text-text">{qry.avg_exec?.toFixed(1) || '0.0'}s</h4>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-[0.2em] mb-1">Avg Execution</p>
+                        <h4 className="text-2xl font-extrabold text-black">{qry.avg_exec?.toFixed(1) || '0.0'}s</h4>
                     </div>
-                    <div className="text-[10px] text-text-muted font-bold flex items-center gap-1 uppercase tracking-widest">
+                    <div className="text-[10px] text-black font-bold flex items-center gap-1 uppercase tracking-widest">
                         <Clock className="w-3.5 h-3.5 opacity-20" /> Performance Latency
                     </div>
                 </div>
 
-                <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
+                <div className="p-6 glass-card bg-gradient-to-br from-white/70 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-warning/10 border border-warning/20 rounded-lg w-fit mb-4">
                             <AlertTriangle className="w-5 h-5 text-warning" />
                         </div>
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Detected Issues</p>
-                        <h4 className="text-2xl font-extrabold text-text">{qry.problem_count || 0}</h4>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-[0.2em] mb-1">Detected Issues</p>
+                        <h4 className="text-2xl font-extrabold text-black">{qry.problem_count || 0}</h4>
                     </div>
                     <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${qry.problem_count > 0 ? 'text-danger' : 'text-success'}`}>
                         {qry.problem_count > 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />} 
@@ -228,15 +236,15 @@ const QueryIntelligence = () => {
                     </div>
                 </div>
 
-                <div className="p-6 glass-card bg-gradient-to-br from-sidebar/80 to-background flex flex-col justify-between h-44">
+                <div className="p-6 glass-card bg-gradient-to-br from-white/70 to-background flex flex-col justify-between h-44">
                     <div>
                         <div className="p-2 bg-primary/10 border border-primary/20 rounded-lg w-fit mb-4">
                             <Database className="w-5 h-5 text-primary" />
                         </div>
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.2em] mb-1">Compute Spilled</p>
-                        <h4 className="text-2xl font-extrabold text-text">{qry.total_spill_gb?.toFixed(1) || '0.0'} GB</h4>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-[0.2em] mb-1">Compute Spilled</p>
+                        <h4 className="text-2xl font-extrabold text-black">{qry.total_spill_gb?.toFixed(1) || '0.0'} GB</h4>
                     </div>
-                    <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${(qry.total_spill_gb || 0) > 1 ? 'text-warning' : 'text-text-muted'}`}>
+                    <div className={`text-[10px] font-bold flex items-center gap-1 uppercase tracking-widest ${(qry.total_spill_gb || 0) > 1 ? 'text-warning' : 'text-black'}`}>
                         <Database className="w-3.5 h-3.5 opacity-20" /> Memory Pressure
                     </div>
                 </div>
@@ -291,12 +299,12 @@ const QueryIntelligence = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="p-12 border border-dashed border-border rounded-xl flex flex-col items-center justify-center text-center">
+                        <div className="p-12 border border-dashed border-black/10 rounded-xl flex flex-col items-center justify-center text-center">
                             <div className="p-4 bg-black/5 border border-black/10 rounded-full mb-6">
                                 <Search className="w-10 h-10 text-text/20" strokeWidth={1} />
                             </div>
-                            <h4 className="text-xl font-bold text-text mb-2">No heavy queries found</h4>
-                            <p className="text-text-muted max-w-xs text-sm">Your Snowflake instance seems to be running efficient workloads tonight.</p>
+                            <h4 className="text-xl font-bold text-black mb-2">No heavy queries found</h4>
+                            <p className="text-black max-w-xs text-sm">Your Snowflake instance seems to be running efficient workloads tonight.</p>
                         </div>
                     )}
                 </div>

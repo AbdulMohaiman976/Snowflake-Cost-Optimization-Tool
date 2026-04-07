@@ -200,7 +200,7 @@ const UserSecurity = () => {
                 <div className="overflow-x-auto max-h-[400px]">
                     <table className="w-full text-left border-collapse table-fixed">
                         <thead className="sticky top-0 z-10 bg-sidebar">
-                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/20 text-[10px] font-bold text-black uppercase tracking-widest border-b border-black/10">
                                 <th className="px-4 py-4 w-[25%]">Username</th>
                                 <th className="px-4 py-4 w-[20%]">Role</th>
                                 <th className="px-4 py-4 w-[15%] text-center">Status</th>
@@ -213,18 +213,18 @@ const UserSecurity = () => {
                                 <tr key={idx} className="group hover:bg-black/[0.02] transition-colors">
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-6 h-6 rounded bg-sidebar border border-border flex items-center justify-center">
-                                                <Users className="w-3 h-3 text-text-muted" />
+                                            <div className="w-6 h-6 rounded bg-white border border-black/10 flex items-center justify-center">
+                                                <Users className="w-3 h-3 text-black" />
                                             </div>
                                             <span className="text-xs font-bold text-text truncate max-w-[150px]" title={u.username}>{u.username}</span>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3 text-[10px] font-mono text-text-muted truncate">
+                                    <td className="px-4 py-3 text-[10px] font-mono text-black truncate">
                                         {u.role || 'N/A'}
                                     </td>
                                     <td className="px-4 py-3 text-center">
                                         {u.disabled ? (
-                                            <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-sidebar text-text-muted border border-border">Disabled</span>
+                                            <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-white text-black border border-black/10">Disabled</span>
                                         ) : u.days_inactive > 90 ? (
                                             <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-warning/10 text-warning border border-warning/20">Inactive</span>
                                         ) : (
@@ -238,7 +238,7 @@ const UserSecurity = () => {
                                             <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${u.role?.toUpperCase().includes('ADMIN') ? 'bg-danger/10 text-danger border border-danger/20' : 'bg-warning/10 text-warning border border-warning/20'}`}>Disabled</span>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3 text-[10px] text-text-muted">
+                                    <td className="px-4 py-3 text-[10px] text-black">
                                         {u.last_login} <span className="opacity-50">({u.days_inactive} days ago)</span>
                                     </td>
                                 </tr>

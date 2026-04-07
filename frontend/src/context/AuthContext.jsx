@@ -1,23 +1,12 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [session, setSession] = useState(() => {
-    const saved = localStorage.getItem('snow_session');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (session) {
-      localStorage.setItem('snow_session', JSON.stringify(session));
-    } else {
-      localStorage.removeItem('snow_session');
-    }
-  }, [session]);
 
   const login = (sessionData) => {
     setSession(sessionData);

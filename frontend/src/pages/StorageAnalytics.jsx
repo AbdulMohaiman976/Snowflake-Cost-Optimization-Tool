@@ -67,13 +67,13 @@ const StorageAnalytics = () => {
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Optimization of data footprint, Time Travel overhead, and Failsafe identification across your databases.</p>
                 </div>
                 <div className="flex gap-4">
-                  <div className="p-4 bg-black/30 border border-border rounded-xl">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Active (GB)</p>
-                    <p className="text-xl font-black text-text font-mono">{storageData.total_active_gb?.toFixed(2)}</p>
+                  <div className="p-4 bg-white/70 border border-black/10 rounded-2xl">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Total Active (GB)</p>
+                    <p className="text-xl font-black text-black font-mono">{storageData.total_active_gb?.toFixed(2)}</p>
                   </div>
-                  <div className="p-4 bg-black/30 border border-border rounded-xl">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Bloated Tables</p>
-                    <p className="text-xl font-black text-danger font-mono">{storageData.bloated_count}</p>
+                  <div className="p-4 bg-white/70 border border-black/10 rounded-2xl">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Bloated Tables</p>
+                    <p className="text-xl font-black text-[#2C7DA0] font-mono">{storageData.bloated_count}</p>
                   </div>
                 </div>
             </div>
@@ -177,7 +177,7 @@ const StorageAnalytics = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/20 text-[10px] font-bold text-black uppercase tracking-widest border-b border-black/10">
                                 <th className="px-6 py-4">Database Object</th>
                                 <th className="px-6 py-4 text-right">Active (GB)</th>
                                 <th className="px-6 py-4 text-right">Time Travel</th>
@@ -193,20 +193,20 @@ const StorageAnalytics = () => {
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-text group-hover:text-primary flex items-center gap-2">
                                                 {table.table}
-                                                {table.is_system && <span className="text-[8px] px-1.5 py-0.5 bg-sidebar rounded border border-border text-text-muted/40 uppercase font-black tracking-widest">SYSTEM</span>}
+                                                {table.is_system && <span className="text-[8px] px-1.5 py-0.5 bg-white rounded border border-black/10 text-black uppercase font-black tracking-widest">SYSTEM</span>}
                                             </span>
-                                            <span className="text-[10px] text-text-muted font-mono">{table.database}.{table.schema}</span>
+                                            <span className="text-[10px] text-black font-mono">{table.database}.{table.schema}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right font-mono text-[13px] text-text font-bold">{table.active_gb?.toFixed(2)}</td>
-                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-text-muted">{table.tt_gb?.toFixed(2)} GB</td>
-                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-text-muted">{table.fs_gb?.toFixed(2)} GB</td>
+                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-black">{table.tt_gb?.toFixed(2)} GB</td>
+                                    <td className="px-6 py-4 text-right font-mono text-[11px] text-black">{table.fs_gb?.toFixed(2)} GB</td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="flex-1 h-1.5 bg-sidebar-item rounded-full overflow-hidden border border-border">
+                                            <div className="flex-1 h-1.5 bg-white rounded-full overflow-hidden border border-black/10">
                                                 <div className={`h-full bg-${table.bloat_pct > 100 ? 'danger' : table.bloat_pct > 50 ? 'warning' : 'success'}`} style={{ width: `${Math.min(table.bloat_pct, 100)}%` }}></div>
                                             </div>
-                                            <span className={`text-[10px] font-bold min-w-[30px] ${table.bloat_pct > 100 ? 'text-danger' : 'text-text-muted'}`}>{table.bloat_pct?.toFixed(0)}%</span>
+                                            <span className={`text-[10px] font-bold min-w-[30px] ${table.bloat_pct > 100 ? 'text-danger' : 'text-black'}`}>{table.bloat_pct?.toFixed(0)}%</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">

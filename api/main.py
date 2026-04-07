@@ -56,7 +56,7 @@ def connect(req: ConnectRequest):
     1. Snowflake se connect karo
     2. ACCOUNT_USAGE data nikalo
     3. Full analysis chalaao
-    4. MongoDB/local JSON mein save karo (account+user se isolated)
+    4. MongoDB Atlas mein save karo (account+user se isolated)
     5. Encrypted session_id + full results return karo
     6. Background mein Groq AI recommendations queue karo
     """

@@ -99,15 +99,15 @@ const SpendAnomaly = () => {
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Early detection of credit spikes and unusual workload patterns before they impact your bill.</p>
                 </div>
                 <div className="flex gap-4">
-                  <div className="p-4 bg-black/30 border border-border rounded-xl">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-2 leading-none">Anomalies Detected</p>
-                    <p className={`text-2xl font-black font-mono ${anomalyCount > 0 ? 'text-danger' : 'text-success'}`}>{anomalyCount}</p>
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">High Priority</p>
+                  <div className="p-4 bg-white/70 border border-black/10 rounded-2xl">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-2 leading-none">Anomalies Detected</p>
+                    <p className="text-2xl font-black font-mono text-[#2C7DA0]">{anomalyCount}</p>
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mt-1">High Priority</p>
                   </div>
-                  <div className="p-4 bg-black/30 border border-border rounded-xl">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-2 leading-none">Warnings</p>
-                    <p className={`text-2xl font-black font-mono ${warningCount > 0 ? 'text-warning' : 'text-success'}`}>{warningCount}</p>
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mt-1">Medium Priority</p>
+                  <div className="p-4 bg-white/70 border border-black/10 rounded-2xl">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-2 leading-none">Warnings</p>
+                    <p className="text-2xl font-black font-mono text-[#2C7DA0]">{warningCount}</p>
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mt-1">Medium Priority</p>
                   </div>
                 </div>
             </div>

@@ -68,14 +68,14 @@ const CostBreakdown = () => {
                   <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Cost Breakdown</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Granular analysis of credit consumption by compute cluster, user workload, and data ownership.</p>
                 </div>
-                <div className="flex gap-4 p-4 bg-black/30 border border-border rounded-xl">
-                  <div className="pr-6 border-r border-border/50">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Credit Spend</p>
-                    <p className="text-xl font-black text-text font-mono">{cost.total_credits?.toFixed(2)}</p>
+                <div className="flex gap-4 p-4 bg-white/70 border border-black/10 rounded-2xl">
+                  <div className="pr-6 border-r border-black/10">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Total Credit Spend</p>
+                    <p className="text-xl font-black text-black font-mono">{cost.total_credits?.toFixed(2)}</p>
                   </div>
                   <div className="pl-2">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Market Price (USD)</p>
-                    <p className="text-xl font-black text-success font-mono">${cost.total_cost_usd?.toLocaleString()}</p>
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Market Price (USD)</p>
+                    <p className="text-xl font-black text-[#2C7DA0] font-mono">${cost.total_cost_usd?.toLocaleString()}</p>
                   </div>
                 </div>
             </div>
@@ -160,7 +160,7 @@ const CostBreakdown = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border">
+                            <tr className="bg-black/20 text-[10px] font-bold text-black uppercase tracking-widest border-b border-black/10">
                                 <th className="px-6 py-4">User & Role</th>
                                 <th className="px-6 py-4">Profile</th>
                                 <th className="px-6 py-4 text-right">Queries</th>
@@ -174,32 +174,32 @@ const CostBreakdown = () => {
                                 <tr key={idx} className="group hover:bg-black/[0.02] transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-sidebar border border-border rounded-lg text-text-muted group-hover:text-primary transition-colors">
+                                            <div className="p-2 bg-white border border-black/10 rounded-lg text-black group-hover:text-primary transition-colors">
                                                 {user.is_system ? <Layers className="w-4 h-4" /> : <User className="w-4 h-4" />}
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-bold text-text leading-tight">{user.user}</span>
-                                                <span className="text-[10px] text-text-muted font-mono tracking-tighter uppercase">{user.role}</span>
+                                                <span className="text-[10px] text-black font-mono tracking-tighter uppercase">{user.role}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className={`px-2 py-1 rounded text-[10px] font-bold inline-block border ${user.is_system ? 'border-primary/20 text-primary bg-primary/10' : 'border-border text-text-muted bg-sidebar'}`}>
+                                        <div className={`px-2 py-1 rounded text-[10px] font-bold inline-block border ${user.is_system ? 'border-primary/20 text-primary bg-primary/10' : 'border-black/10 text-black bg-white'}`}>
                                             {user.profile}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right font-mono text-xs font-bold text-text">{user.queries?.toLocaleString()}</td>
-                                    <td className="px-6 py-4 text-right font-mono text-xs text-text-accent">{user.avg_exec_sec?.toFixed(2)}s</td>
+                                    <td className="px-6 py-4 text-right font-mono text-xs text-black">{user.avg_exec_sec?.toFixed(2)}s</td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex flex-col items-end gap-1.5">
-                                            <div className="w-16 h-1 bg-border rounded-full overflow-hidden">
+                                            <div className="w-16 h-1 bg-black/10 rounded-full overflow-hidden">
                                                 <div className="h-full bg-primary" style={{ width: `${user.query_share}%` }}></div>
                                             </div>
-                                            <span className="text-[10px] font-bold text-text-muted">{user.query_share}% Share</span>
+                                            <span className="text-[10px] font-bold text-black">{user.query_share}% Share</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <p className="text-[10px] text-text-muted max-w-xs">{user.note}</p>
+                                        <p className="text-[10px] text-black max-w-xs">{user.note}</p>
                                     </td>
                                 </tr>
                             ))}

@@ -7,9 +7,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "#A9D6E5",
+        background: "#A9DDF5",
         surface: "#FFFFFF",
-        sidebar: "#2C7DA0",
+        sidebar: "#DFF3FF",
         card: "rgba(255, 255, 255, 0.75)",
         cardLight: "#F8FAFC", 
         border: "rgba(255, 255, 255, 0.5)",
@@ -18,14 +18,14 @@ export default {
           DEFAULT: "#2C7DA0",
           dark: "#1B5E7A",
         },
-        secondary: "#6366F1", 
+        secondary: "#2C7DA0",
         success: "#059669",
         warning: "#D97706",
         danger: "#DC2626",
         text: {
-          muted: "#5F8B9C",
-          DEFAULT: "#1E3D4A",
-          accent: "#3A606E",
+          muted: "#00000099",
+          DEFAULT: "#000000",
+          accent: "#2C7DA0",
         }
       },
       boxShadow: {

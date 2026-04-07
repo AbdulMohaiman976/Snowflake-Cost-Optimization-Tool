@@ -35,15 +35,13 @@ import {
 const OverviewDataCard = ({ title, value, detail, icon: Icon, color, trend, onClick, isSelected }) => (
     <div 
         onClick={onClick}
-        className={`glass-card p-6 flex items-start justify-between group overflow-hidden relative cursor-pointer border-t-4 transition-all hover:scale-[1.02] ${isSelected ? `border-${color} bg-black/[0.03]` : 'border-transparent'}`}
+        className={`glass-card p-6 flex items-start justify-between group overflow-hidden relative cursor-pointer transition-all hover:scale-[1.02] bg-gradient-to-br from-white/70 to-background ${isSelected ? 'ring-2 ring-primary/30' : ''}`}
     >
-        {/* Glow effect on hover */}
-        <div className={`absolute top-0 right-0 w-32 h-32 opacity-0 group-hover:opacity-10 transition-opacity bg-${color} rounded-full blur-[40px] translate-x-10 -translate-y-10`}></div>
-        
+        <div className="absolute top-0 right-0 w-32 h-32 opacity-0 group-hover:opacity-10 transition-opacity bg-black rounded-full blur-[40px] translate-x-10 -translate-y-10"></div>
         <div>
-            <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-4 block">{title}</span>
+            <span className="text-[10px] font-bold text-black uppercase tracking-[0.2em] mb-4 block">{title}</span>
             <div className="flex items-baseline gap-2 mb-2">
-                <h3 className="text-3xl font-extrabold text-text tracking-tight">{value}</h3>
+                <h3 className="text-3xl font-extrabold text-black tracking-tight">{value}</h3>
                 {trend !== undefined && (
                     <div className={`flex items-center gap-0.5 text-[11px] font-bold ${trend > 0 ? 'text-danger' : 'text-success'}`}>
                         {trend > 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
@@ -51,9 +49,9 @@ const OverviewDataCard = ({ title, value, detail, icon: Icon, color, trend, onCl
                     </div>
                 )}
             </div>
-            <p className="text-xs text-text-muted/80 font-medium leading-relaxed max-w-[180px]">{detail}</p>
+            <p className="text-xs text-black font-medium leading-relaxed max-w-[180px]">{detail}</p>
         </div>
-        <div className={`p-4 bg-${color}/10 border border-${color}/20 rounded-2xl`}>
+        <div className="p-4 bg-white border border-black/10 rounded-2xl">
             <Icon className={`w-6 h-6 text-${color}`} strokeWidth={1.5} />
         </div>
     </div>
@@ -63,7 +61,15 @@ const Overview = () => {
     const { session } = useAuth();
     const health = session?.health || {};
     const warehouse = session?.warehouse || {};
+    const cost = session?.cost || {};
     const savings = session?.savings || {};
+
+    const spendCredits = Number(
+        cost?.total_credits ?? warehouse?.total_credits ?? 0
+    );
+    const spendCostUsd = Number(
+        cost?.total_cost_usd ?? warehouse?.total_cost_usd ?? 0
+    );
 
     const healthColor = health.overall >= 75 ? 'success' : health.overall >= 50 ? 'warning' : 'danger';
     const [selectedTab, setSelectedTab] = useState('spend');
@@ -120,13 +126,16 @@ const Overview = () => {
             <div className="grid grid-cols-4 gap-6">
                 <div 
                     onClick={() => setSelectedTab('health')}
-                    className={`p-8 glass-card border-l-[6px] border-${healthColor} bg-gradient-to-br from-sidebar to-background cursor-pointer transition-all ${selectedTab === 'health' ? 'ring-2 ring-primary/40 scale-[1.02]' : ''}`}
+                    className={`p-8 glass-card bg-gradient-to-br from-white/70 to-background cursor-pointer transition-all ${selectedTab === 'health' ? 'ring-2 ring-primary/30 scale-[1.02]' : ''}`}
                 >
-                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-4 block">Overall Health</span>
+                    <span className="text-[10px] font-bold text-black uppercase tracking-[0.2em] mb-4 block">Overall Health</span>
                     <div className="flex items-baseline gap-2 mb-2">
-                        <h2 className={`text-6xl font-black text-text`}>{health?.overall || 0} <span className="text-xl text-text-muted/40 font-normal">/100</span></h2>
+                        <h2 className="text-6xl font-black text-black">
+                            {health?.overall || 0}
+                            <span className="text-xl text-black/40 font-normal">/100</span>
+                        </h2>
                     </div>
-                    <div className="flex items-center gap-2 mt-4 px-3 py-1 bg-black/5 border border-black/10 rounded-full w-fit">
+                    <div className="flex items-center gap-2 mt-4 px-3 py-1 bg-white border border-black/10 rounded-full w-fit">
                         <div className={`w-2 h-2 rounded-full bg-${healthColor}`}></div>
                         <span className={`text-[10px] font-bold uppercase tracking-wider text-${healthColor}`}>{health?.grade || 'N/A'}</span>
                     </div>
@@ -134,8 +143,8 @@ const Overview = () => {
 
                 <OverviewDataCard 
                     title="Estimated Monthly Spend"
-                    value={`$${(warehouse?.total_cost_usd || 0).toLocaleString()}`}
-                    detail={`${(warehouse?.total_credits || 0).toFixed(2)} total credits used`}
+                    value={`$${spendCostUsd.toLocaleString()}`}
+                    detail={`${spendCredits.toFixed(2)} total credits used (last 30 days)`}
                     icon={TrendingUp}
                     color="primary"
                     trend={spendTrend !== 0 ? spendTrend : undefined}
@@ -155,7 +164,7 @@ const Overview = () => {
 
                 <OverviewDataCard 
                     title="Credits Spent (30 Days)"
-                    value={(warehouse?.total_credits || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    value={spendCredits.toLocaleString(undefined, { maximumFractionDigits: 2 })}
                     detail="Total compute credits burned over the last 30 days"
                     icon={Zap}
                     color="primary"

@@ -1460,17 +1460,14 @@ with tab9:
     sid = st.session_state.get("session_id")
 
     if not sid:
-        # Fallback to local JSON files if no API session
-        acct_slug = info.get("account","").lower().replace(".","").replace("-","")
-        hist      = analysis.analyze_historical_trend("data", acct_slug)
-        if not hist.get("has_trend"):
-            st.markdown(f"""
-            <div class='sa-card'>
-              <p class='sa-title'>📊 {hist.get("note","Run the tool again to build trend data.")}</p>
-              <p class='sa-detail'>Connect via FastAPI to enable MongoDB-backed trend history across sessions.
-              Currently showing local file history only.</p>
-            </div>""", unsafe_allow_html=True)
-        runs_for_chart = hist.get("runs", [])
+        runs_for_chart = []
+        st.markdown("""
+        <div class='sa-card'>
+          <p class='sa-title'>Trend data requires a MongoDB session</p>
+          <p class='sa-detail'>Connect via FastAPI so your runs are saved in MongoDB Atlas.</p>
+        </div>""", unsafe_allow_html=True)
+
+
     else:
         # Load history from MongoDB via API
         try:

@@ -1069,7 +1069,7 @@ def calculate_health_score(wh, qry, anomaly, storage, users) -> dict:
 # ══════════════════════════════════════════════════════════════════
 
 def build_ai_json(account_info: dict, health: dict, wh, qry, anomaly,
-                  cost, storage, users, notebooks, unused, raw_data: dict) -> dict:
+                  cost, storage, users, notebooks, unused, cloud, raw_data: dict) -> dict:
     """
     AI layer ke liye structured JSON.
     Yeh format directly kisi bhi LLM ko de sakte hain — woh apni insights dega.
@@ -1077,7 +1077,7 @@ def build_ai_json(account_info: dict, health: dict, wh, qry, anomaly,
     all_recs = []
     for module_name, module in [("warehouse",wh),("queries",qry),("anomaly",anomaly),
                                   ("storage",storage),("users",users),("cost",cost),
-                                  ("unused",unused)]:
+                                  ("unused",unused),("cloud_services",cloud)]:
         for r in module.get("recommendations",[]):
             all_recs.append({**r, "module": module_name})
 
@@ -1730,6 +1730,7 @@ def run_analysis(data: dict, account_info: dict = None) -> dict:
     users       = analyze_users(data)
     notebooks   = analyze_notebooks(data)
     unused      = analyze_unused_objects(data)
+    cloud       = analyze_cloud_services(data)
     health      = calculate_health_score(wh, qry, anomaly, storage, users)
     # Strip user/anomaly scores for simplified UI
     if isinstance(health, dict) and isinstance(health.get('scores'), dict):
@@ -1744,7 +1745,7 @@ def run_analysis(data: dict, account_info: dict = None) -> dict:
 
     ai_json     = build_ai_json(
         account_info or {}, health, wh, qry, anomaly, cost, storage, users, notebooks,
-        unused, data
+        unused, cloud, data
     )
 
     return {
@@ -1757,7 +1758,7 @@ def run_analysis(data: dict, account_info: dict = None) -> dict:
         "users":          users,
         "notebooks":      notebooks,
         "unused_objects": unused,
-        "cloud_services": {},
+        "cloud_services": cloud,
         "savings":        savings,
         "auto_suspend":   auto_sus,
         "ai_json":        ai_json,

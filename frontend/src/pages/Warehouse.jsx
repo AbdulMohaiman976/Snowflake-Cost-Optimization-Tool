@@ -126,18 +126,18 @@ const Warehouse = () => {
                   <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Warehouse Analytics</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Real-time analysis of warehouse sizing, queuing patterns, and credit consumption.</p>
                 </div>
-                <div className="p-3 bg-primary/5 border border-primary/20 rounded-2xl flex items-center gap-4">
-                  <div className="px-4 border-r border-border">
-                    <div className="text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] mb-0.5">Total Credits (30d)</div>
-                    <div className="text-lg font-bold text-text font-mono">{wh.total_credits?.toFixed(2)}</div>
+                <div className="p-4 bg-white/70 border border-black/10 rounded-2xl flex items-center gap-6">
+                  <div className="px-4 border-r border-black/10">
+                    <div className="text-[10px] font-bold text-black uppercase tracking-[0.15em] mb-0.5">Total Credits (30d)</div>
+                    <div className="text-lg font-bold text-black font-mono">{wh.total_credits?.toFixed(2)}</div>
                   </div>
-                  <div className="px-4 border-r border-border">
-                    <div className="text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] mb-0.5">Active Warehouses</div>
-                    <div className="text-lg font-bold text-text font-mono">{warehouses.length}</div>
+                  <div className="px-4 border-r border-black/10">
+                    <div className="text-[10px] font-bold text-black uppercase tracking-[0.15em] mb-0.5">Active Warehouses</div>
+                    <div className="text-lg font-bold text-black font-mono">{warehouses.length}</div>
                   </div>
                   <div className="px-4">
-                    <div className="text-[10px] font-bold text-text-muted uppercase tracking-[0.15em] mb-0.5">Detected Issues</div>
-                    <div className={`text-lg font-bold font-mono ${(aiRecs?.layer1?.alerts || []).length > 0 ? 'text-danger' : 'text-success'}`}>
+                    <div className="text-[10px] font-bold text-black uppercase tracking-[0.15em] mb-0.5">Detected Issues</div>
+                    <div className="text-lg font-bold font-mono text-[#2C7DA0]">
                         {(aiRecs?.layer1?.alerts || []).length}
                     </div>
                   </div>
@@ -156,7 +156,7 @@ const Warehouse = () => {
                 <div className="overflow-x-auto overflow-y-auto max-h-[500px]">
                     <table className="w-full text-left border-collapse table-fixed min-w-[800px]">
                         <thead>
-                            <tr className="bg-black/30 text-[10px] font-bold text-text-muted uppercase tracking-widest border-b border-border sticky top-0 z-10">
+                            <tr className="bg-black/20 text-[10px] font-bold text-black uppercase tracking-widest border-b border-black/10 sticky top-0 z-10">
                                 <th className="px-4 py-4 font-bold w-[35%]">Warehouse Name</th>
                                 <th className="px-4 py-4 font-bold w-[12%]">Size</th>
                                 <th className="px-4 py-4 font-bold text-right w-[12%]">Credits</th>
@@ -178,19 +178,19 @@ const Warehouse = () => {
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-colors ${w.current_size === 'X-Small' ? 'bg-sidebar text-text-muted border border-border' : 'bg-primary/20 text-primary border border-primary/20'}`}>
+                                        <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-colors ${w.current_size === 'X-Small' ? 'bg-white text-black border border-black/10' : 'bg-primary/20 text-black border border-black/10'}`}>
                                             {w.current_size}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3 text-right font-mono text-xs text-text-accent font-bold">
+                                    <td className="px-4 py-3 text-right font-mono text-xs text-black font-bold">
                                         {w.credits?.toFixed(2)}
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <div className="w-12 h-1 bg-sidebar rounded-full overflow-hidden border border-border">
+                                            <div className="w-12 h-1 bg-white rounded-full overflow-hidden border border-black/10">
                                                 <div className={`h-full bg-${w.queue_pct > 15 ? 'danger' : w.queue_pct > 5 ? 'warning' : 'success'}`} style={{ width: `${Math.min(w.queue_pct, 100)}%` }}></div>
                                             </div>
-                                            <span className={`text-[9px] font-bold ${w.queue_pct > 15 ? 'text-danger' : 'text-text-muted'}`}>{w.queue_pct?.toFixed(0)}%</span>
+                                            <span className={`text-[9px] font-bold ${w.queue_pct > 15 ? 'text-danger' : 'text-black'}`}>{w.queue_pct?.toFixed(0)}%</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">

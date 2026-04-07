@@ -49,14 +49,14 @@ const Notebooks = () => {
                   <h1 className="text-3xl font-extrabold tracking-tight text-text mb-2">Notebooks</h1>
                   <p className="text-text-muted text-sm max-w-lg leading-relaxed">Visibility into Snowflake Notebook execution, Python workloads, and data science compute resources.</p>
                 </div>
-                <div className="flex gap-4 p-4 bg-black/30 border border-border rounded-xl">
-                  <div className="pr-6 border-r border-border/50">
-                    <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Total Executions</p>
-                    <p className="text-xl font-black text-text font-mono">{notebooks.total_runs || 0}</p>
+                <div className="flex gap-4 p-4 bg-white/70 border border-black/10 rounded-2xl">
+                  <div className="pr-6 border-r border-black/10">
+                    <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Total Executions</p>
+                    <p className="text-xl font-black text-black font-mono">{notebooks.total_runs || 0}</p>
                   </div>
                     <div className="pl-2">
-                        <p className="text-[10px] text-text-muted font-bold uppercase tracking-widest mb-1.5 leading-none">Compute Used (h)</p>
-                        <p className="text-xl font-black text-primary font-mono">{notebooks.total_compute_hours?.toFixed(1) || '0.0'}h</p>
+                        <p className="text-[10px] text-black font-bold uppercase tracking-widest mb-1.5 leading-none">Compute Used (h)</p>
+                        <p className="text-xl font-black text-[#2C7DA0] font-mono">{notebooks.total_compute_hours?.toFixed(1) || '0.0'}h</p>
                     </div>
                 </div>
             </div>
